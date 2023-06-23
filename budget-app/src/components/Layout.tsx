@@ -12,25 +12,56 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [darkMode, setDarkMode] = useState(prefersDarkMode);
-  const theme = createTheme({
-    palette: {
-      type: darkMode ? 'dark' : 'light',
-    },
-    typography: {
-      h2: {
-        color: darkMode ? '#f0f0f0' : '#333',
-      },
-      
-      h4: {
-        color: darkMode ? '#f0f0f0' : '#333',
-      },
-      
-      h6: {
-        color: darkMode ? '#f0f0f0' : '#333',
-      },
-    },
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedDarkMode = sessionStorage.getItem('darkMode');
+    return savedDarkMode !== null ? JSON.parse(savedDarkMode) : prefersDarkMode;
   });
+  useEffect(() => {
+    // Save dark mode state to sessionStorage
+    sessionStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
+const theme = createTheme({
+  palette: {
+    type: darkMode ? 'dark' : 'light',
+  },
+  typography: {
+    h2: {
+      color: darkMode ? '#f0f0f0' : '#333',
+    },
+    h4: {
+      color: darkMode ? '#f0f0f0' : '#333',
+    },
+    h5: {
+      color: darkMode ? '#f0f0f0' : '#333',
+    },
+  },
+  overrides: {
+    MuiTable: {
+      root: {
+        backgroundColor: darkMode ? '#888' : '#f0f0f0',
+      },
+    },
+    MuiTableCell: {
+      root: {
+        color: darkMode ? '#f0f0f0' : '#333',
+      },
+    },
+    MuiTableHead: {
+      root: {
+        backgroundColor: darkMode ? '#666' : '#ccc',
+      },
+    },
+    MuiTableRow: {
+      root: {
+        '&:hover': {
+          backgroundColor: darkMode ? '#444' : '#ddd',
+        },
+      },
+    },
+  },
+});
+
 
   useEffect(() => {
     const body = document.getElementsByTagName('body')[0];
@@ -85,7 +116,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Main content */}
-        <div style={{ marginTop: '50px' }}>{children}</div>
+        <div style={{ marginTop: '80px', paddingTop: '5px' }}>{children}</div>
 
         {/* Back to home button */}
         {location.pathname !== '/' && (

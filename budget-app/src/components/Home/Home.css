@@ -33,3 +33,11 @@ body {
   .Home-cta:hover {
     background-color: #1e3799;
   }
+  
+  .Home-cta-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+  }
+  

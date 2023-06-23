@@ -46,17 +46,17 @@ const Home: React.FC = () => {
             </Grid>
           ))}
         </Grid>
-                <Box display="flex" justifyContent="center" mt={4}>
-          <Button 
-            variant="contained" 
-            color="primary"
-            size="large"
-            className="Home-cta"
-            onClick={navigateToDashboard}
-          >
-            Get Started
-          </Button>
-        </Box>
+        <Box display="flex" justifyContent="center" alignItems="center" className="Home-cta-container">
+  <Button
+    variant="contained"
+    color="primary"
+    size="large"
+    className="Home-cta"
+    onClick={navigateToDashboard}
+  >
+    Get Started
+  </Button>
+</Box>
       </Container>
     </Box>
   );
