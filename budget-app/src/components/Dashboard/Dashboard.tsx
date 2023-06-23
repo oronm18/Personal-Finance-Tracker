@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles, Box, Grid, Typography } from '@material-ui/core';
-import TransactionTable from './TransactionTable';
-import SavingsGoalTable from './SavingsGoalTable';
+import TransactionTable from '../Table/TransactionTable';
+import SavingsGoalTable from '../Table/SavingsGoalTable';
 
 const useStyles = makeStyles(theme => ({
   borderBox: {

@@ -26,8 +26,8 @@ export const addSavingsGoal = async () => {
   return response.data;
 };
 
-export const removeTransaction = async () => {
-  const response = await api.delete('/transactions'); 
+export const removeTransaction = async (transaction: any) => {
+  const response = await api.delete('/transactions', { data: transaction.name });
   console.log(response.data);
   return response.data;
 };
