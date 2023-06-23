@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, createTheme, ThemeProvider, useMediaQuery } from '@material-ui/core';
-import { Typography, Box, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@material-ui/core';
+import { makeStyles, Box, Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@material-ui/core';
+import { fetchSavingsGoals, fetchTransactions } from '../../api';
+
+const useStyles = makeStyles(theme => ({
+  borderBox: {
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing(2),
+    backgroundColor: theme.palette.background.default,
+  },
+  title: {
+    marginBottom: theme.spacing(2),
+  },
+}));
 
 interface Transaction {
   name: string;
@@ -25,121 +37,171 @@ const initialState: State = {
   savingsGoals: [],
 };
 
-const useStyles = makeStyles((theme) => ({
-  borderBox: {
-    border: '1px solid #ccc',
-    padding: theme.spacing(3),
-    borderRadius: theme.spacing(1),
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: theme.spacing(2),
-    color: '#9c27b0', // Purple color
-  },
-}));
-
 const Dashboard: React.FC = () => {
   const classes = useStyles();
   const [stateData, setStateData] = useState<State>(initialState);
+  const [selectedData, setSelectedData] = useState<Transaction | SavingGoal | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
 
+  // Update the data fetching logic according to your actual data sources
   useEffect(() => {
     const fetchData = async () => {
-      const transactions: Transaction[] = [
-        { name: 'Salary', amount: 5000, category: 'Income', date: '2023-06-01' },
-        { name: 'Rent', amount: -1000, category: 'Expense', date: '2023-06-01' },
-      ];
-
-      const savingsGoals: SavingGoal[] = [
-        { name: 'New Car', current: 5000, target: 10000 },
-        { name: 'Home', current: 0, target: 5000000 },
-      ];
-
-      setStateData({ transactions, savingsGoals });
+      setStateData(
+      {
+        transactions: await fetchTransactions(),
+        savingsGoals: await fetchSavingsGoals(),
+      }
+      );
+      
     };
-
     fetchData();
   }, []);
+
+  const handleRowClick = (data: Transaction | SavingGoal) => {
+    setSelectedData(data);
+    setOpenDialog(true);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
+
+  const renderDialog = () => {
+    if (!selectedData) return null;
+
+    const isTransaction = 'category' in selectedData;
+
+    return (
+      <Dialog open={openDialog} onClose={handleClose} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">{isTransaction ? 'Transaction Details' : 'Savings Goal Details'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Name"
+            type="text"
+            fullWidth
+            value={selectedData.name}
+            disabled
+          />
+          {isTransaction && (
+            <>
+              <TextField
+                margin="dense"
+                id="amount"
+                label="Amount"
+                type="number"
+                fullWidth
+                value={(selectedData as Transaction).amount}
+                disabled
+              />
+              <TextField
+                margin="dense"
+                id="category"
+                label="Category"
+                type="text"
+                fullWidth
+                value={(selectedData as Transaction).category}
+                disabled
+              />
+              <TextField
+                margin="dense"
+                id="date"
+                label="Date"
+                type="text"
+                fullWidth
+                value={(selectedData as Transaction).date}
+                disabled
+              />
+            </>
+          )}
+          {!isTransaction && (
+            <>
+              <TextField
+                margin="dense"
+                id="current"
+                label="Current"
+                type="number"
+                fullWidth
+                value={(selectedData as SavingGoal).current}
+                disabled
+              />
+              <TextField
+                margin="dense"
+                id="target"
+                label="Target"
+                type="number"
+                fullWidth
+                value={(selectedData as SavingGoal).target}
+                disabled
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
+
   return (
-    <Box>
-      <Box className={classes.borderBox}>
-        <Typography variant="h4" className={classes.title}>Finance Dashboard</Typography>
+    <Box className={classes.borderBox}>
+      <Typography className={classes.title} variant="h5">Dashboard</Typography>
+      <Box mt={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
-            {/* Transactions */}
-            <Typography variant="h6">Transactions</Typography>
-            {/* Add Transaction Button */}
-            <Button variant="contained" color="primary" onClick={() => console.log('Add transaction')}>
-              Add Transaction
-            </Button>
-            {/* Remove Transaction Button */}
-            <Button variant="contained" color="secondary" onClick={() => console.log('Remove transaction')}>
-              Remove Transaction
-            </Button>
-            {/* Transactions Table */}
-            <Paper>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Amount</TableCell>
-                      <TableCell>Category</TableCell>
-                      <TableCell>Date</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
+            <TableContainer component={Paper}>
+              <Table aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell align="right">Amount</TableCell>
+                    <TableCell align="right">Category</TableCell>
+                    <TableCell align="right">Date</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
                   {stateData.transactions.map((transaction, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{transaction.name}</TableCell>
-                      <TableCell>{transaction.amount}</TableCell>
-                      <TableCell>{transaction.category}</TableCell>
-                      <TableCell>{transaction.date}</TableCell>
+                    <TableRow key={index} onClick={() => handleRowClick(transaction)}>
+                      <TableCell component="th" scope="row">{transaction.name}</TableCell>
+                      <TableCell align="right">{transaction.amount}</TableCell>
+                      <TableCell align="right">{transaction.category}</TableCell>
+                      <TableCell align="right">{transaction.date}</TableCell>
                     </TableRow>
                   ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
-
           <Grid item xs={12} sm={6}>
-            {/* Savings Goals */}
-            <Typography variant="h6">Savings Goals</Typography>
-            {/* Add Saving Goal Button */}
-            <Button variant="contained" color="primary" onClick={() => console.log('Add saving goal')}>
-              Add Saving Goal
-            </Button>
-            {/* Remove Saving Goal Button */}
-            <Button variant="contained" color="secondary" onClick={() => console.log('Remove saving goal')}>
-              Remove Saving Goal
-            </Button>
-            {/* Savings Goals Table */}
-            <Paper>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Current</TableCell>
-                      <TableCell>Target</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
+            <TableContainer component={Paper}>
+              <Table aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell align="right">Current</TableCell>
+                    <TableCell align="right">Target</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
                   {stateData.savingsGoals.map((goal, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{goal.name}</TableCell>
-                      <TableCell>{goal.current}</TableCell>
-                      <TableCell>{goal.target}</TableCell>
+                    <TableRow key={index} onClick={() => handleRowClick(goal)}>
+                      <TableCell component="th" scope="row">{goal.name}</TableCell>
+                      <TableCell align="right">{goal.current}</TableCell>
+                      <TableCell align="right">{goal.target}</TableCell>
                     </TableRow>
                   ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
         </Grid>
       </Box>
-
+      {renderDialog()}
     </Box>
   );
 };

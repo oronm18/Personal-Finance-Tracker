@@ -5,13 +5,35 @@ const api = axios.create({
 });
 
 export const fetchTransactions = async () => {
-  const response = await api.get('/transactions'); // Replace with your endpoint
+  const response = await api.get('/transactions'); 
   console.log(response.data);
   return response.data;
 };
 
 export const fetchSavingsGoals = async () => {
-  const response = await api.get('/savings-goals'); // Replace with your endpoint
+  const response = await api.get('/savings-goals'); 
+  return response.data;
+};
+
+export const addTransaction = async () => {
+  const response = await api.put('/transactions'); 
+  console.log(response.data);
+  return response.data;
+};
+
+export const addSavingsGoal = async () => {
+  const response = await api.put('/savings-goals'); 
+  return response.data;
+};
+
+export const removeTransaction = async () => {
+  const response = await api.delete('/transactions'); 
+  console.log(response.data);
+  return response.data;
+};
+
+export const removeSavingsGoal = async () => {
+  const response = await api.delete('/savings-goals'); 
   return response.data;
 };
 

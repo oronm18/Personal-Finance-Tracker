@@ -100,8 +100,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               bottom: '20px',
               right: '20px',
               zIndex: 9999,
-              backgroundColor: darkMode ? '#333' : '#f0f0f0',
-              color: darkMode ? '#f0f0f0' : '#333',
+              backgroundColor: darkMode ? '#f0f0f0' : '#333',
+              color: darkMode ? '#333' : '#f0f0f0',
             }}
           >
             Back to Home
