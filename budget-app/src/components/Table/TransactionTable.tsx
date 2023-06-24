@@ -1,19 +1,26 @@
 import { fetchTransactions, addTransaction, removeTransaction } from '../../api';
 import DataTable from './DataTable';
 
+export const TransactionKeys = {
+  transaction_id: '',
+  name: '',
+  amount: '',
+  category: '',
+  date: '',
+};
+
+export type Transaction = typeof TransactionKeys;
+
+const transactionKeys: (keyof Transaction)[] = Object.keys(TransactionKeys) as (keyof Transaction)[];
+
 const TransactionTable: React.FC = () => {
   return (
     <DataTable
       fetchItems={fetchTransactions}
       addItem={addTransaction}
       removeItem={removeTransaction}
-      headers={["Name", "Amount", "Category", "Date"]}
-      itemDetails={(item) => [
-        { name: "Name", value: item.name },
-        { name: "Amount", value: item.amount },
-        { name: "Category", value: item.category },
-        { name: "Date", value: item.date },
-      ]}
+      headers={transactionKeys.map(key => key)}
+      itemDetails={(item: any) => transactionKeys.map(key => ({ name: key, value: item[key]}))}
     />
   );
 };

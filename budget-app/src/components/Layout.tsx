@@ -59,6 +59,16 @@ const theme = createTheme({
         },
       },
     },
+    MuiTextField: {
+      root: {
+        color: darkMode ? '#f0f0f0' : '#333',
+      },
+    },
+    MuiTableContainer: {
+      root: {
+        width: '100%',
+      },
+    },
   },
 });
 

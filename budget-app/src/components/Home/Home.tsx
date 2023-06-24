@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardMedia, Grid, Typography, Button, Container, Switch, useMediaQuery, Box } from '@material-ui/core';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom';
 import TransactionImage from '../../assets/transaction.jpg';
 import SavingsGoalImage from '../../assets/saving.jpg';
@@ -14,7 +13,7 @@ const features = [
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const navigateToDashboard = () => {
-    navigate('/dashboard');
+    navigate('/login');
   };
 
   return (

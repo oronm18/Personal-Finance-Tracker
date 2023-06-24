@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://192.168.10.114:8000', // Replace with your API's base URL
+  baseURL: 'http://192.168.10.114:8000',
 });
 
 export const fetchTransactions = async () => {
@@ -15,26 +15,31 @@ export const fetchSavingsGoals = async () => {
   return response.data;
 };
 
-export const addTransaction = async () => {
-  const response = await api.put('/transactions'); 
+export const addTransaction = async (transaction: any) => {
+  console.log(transaction);
+
+  const response = await api.post('/transactions', transaction); 
+  return response.data;
+};
+
+export const addSavingsGoal = async (savings_goals: any) => {
+  const response = await api.post('/savings-goals', savings_goals); 
+  return response.data;
+};
+
+export const removeTransaction = async (transaction_id: string) => {
+  const response = await api.delete(`/transactions?transaction=${transaction_id}`);
   console.log(response.data);
   return response.data;
 };
 
-export const addSavingsGoal = async () => {
-  const response = await api.put('/savings-goals'); 
+export const removeSavingsGoal = async (saving_goal_id: string) => {
+  const response = await api.delete(`/savings-goals?saving_goal=${saving_goal_id}`);
   return response.data;
 };
 
-export const removeTransaction = async (transaction: any) => {
-  const response = await api.delete('/transactions', { data: transaction.name });
-  console.log(response.data);
+export const login = async (username: string, password: string) => {
+  const response = await api.post(`/login`, { username, password });
   return response.data;
 };
 
-export const removeSavingsGoal = async () => {
-  const response = await api.delete('/savings-goals'); 
-  return response.data;
-};
-
-// Add more API functions as needed...
