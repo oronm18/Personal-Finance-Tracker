@@ -17,9 +17,10 @@ const useStyles = makeStyles(theme => ({
 
 interface DashboardProps {
   currentUserId: string;
+  onLogin: (userId: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
+const Dashboard: React.FC<DashboardProps> = ({ currentUserId, onLogin }) => {
   return (
     <Box>
       <Typography align="center" variant="h5">Dashboard</Typography>

@@ -6,19 +6,17 @@ import Dashboard from './components/Dashboard/Dashboard';
 import Login from './components/Login/Login';
 
 function App() {
-  const [userId, setUserId] = useState<string>(''); // State to store the user ID
+  const [userId, setUserId] = useState<string>(() => {
+    const storedUserId = sessionStorage.getItem('userId');
+    return storedUserId ? storedUserId : '';
+  }); // State to store the user ID
 
   useEffect(() => {
-    // Check if the user ID exists in the session storage
-    const storedUserId = sessionStorage.getItem('userId');
-    if (storedUserId) {
-      setUserId(storedUserId);
-    }
-  }, []);
+    // Save the user ID to sessionStorage when it changes
+    sessionStorage.setItem('userId', userId);
+  }, [userId]);
 
   const handleLogin = (userId: string) => {
-    // Save the user ID in session storage
-    sessionStorage.setItem('userId', userId);
     setUserId(userId);
   };
 
@@ -27,7 +25,10 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard currentUserId={userId} />} />
+          <Route
+            path="/dashboard"
+            element={<Dashboard currentUserId={userId} onLogin={handleLogin} />}
+          />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
         </Routes>
       </Layout>
