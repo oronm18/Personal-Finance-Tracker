@@ -3,13 +3,7 @@ import { makeStyles, Typography, TextField, Button } from '@material-ui/core';
 import { login } from '../../api'; // Import the login function from api.ts
 import { useNavigate } from 'react-router-dom';
 import bcrypt from 'bcryptjs';
-
-
-async function hashPassword(password: string) {
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  return hashedPassword;
-}
+import { User } from '../User/User';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,7 +32,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Login: React.FC = () => {
+interface LoginProps {
+  onLogin: (userId: string) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -47,8 +45,10 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await login(username, await hashPassword(password));
+      const user: User = {user_id: "undefined", username: username, password: password}
+      const response = await login(user);
       if (response.user_id !== null) {
+        onLogin(response.user_id);
         console.log('Login successful');
         navigate('/dashboard');
       

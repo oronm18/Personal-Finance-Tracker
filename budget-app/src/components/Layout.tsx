@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import AppLogo from '../assets/logo.png';
 
+export const UserIdTemp: string = "123"
+
 interface LayoutProps {
   children: ReactNode;
 }

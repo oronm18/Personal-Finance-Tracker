@@ -13,7 +13,11 @@ export type Transaction = typeof TransactionKeys;
 
 const transactionKeys: (keyof Transaction)[] = Object.keys(TransactionKeys) as (keyof Transaction)[];
 
-const TransactionTable: React.FC = () => {
+interface TransactionTableProps {
+  currentUserId: string;
+}
+
+const TransactionTable: React.FC<TransactionTableProps> = ({ currentUserId }) => {
   return (
     <DataTable
       fetchItems={fetchTransactions}
@@ -21,6 +25,7 @@ const TransactionTable: React.FC = () => {
       removeItem={removeTransaction}
       headers={transactionKeys.map(key => key)}
       itemDetails={(item: any) => transactionKeys.map(key => ({ name: key, value: item[key]}))}
+      currentUserId={currentUserId}
     />
   );
 };

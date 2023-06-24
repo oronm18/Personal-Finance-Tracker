@@ -30,11 +30,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface TableProps {
-  fetchItems: () => Promise<TableItem[]>;
-  addItem: (item: { [key: string]: string | number }) => Promise<TableItem>;
-  removeItem: (item_name: any) => Promise<void>;
+  fetchItems: (user_id: string) => Promise<TableItem[]>;
+  addItem: (user_id: string, item: any) => Promise<TableItem>;
+  removeItem: (user_id: string, item_name: any) => Promise<void>;
   headers: string[];
   itemDetails: (item: TableItem) => { name: string; value: string | number }[];
+  currentUserId: string;
 }
 
 interface TableItem {
@@ -47,6 +48,7 @@ const DataTable: React.FC<TableProps> = ({
   removeItem,
   headers,
   itemDetails,
+  currentUserId,
 }) => {
   const classes = useStyles();
   const [items, setItems] = useState<TableItem[]>([]);
@@ -57,7 +59,7 @@ const DataTable: React.FC<TableProps> = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      setItems(await fetchItems());
+      setItems(await fetchItems(currentUserId));
     };
     fetchData();
   }, []);
@@ -66,7 +68,7 @@ const DataTable: React.FC<TableProps> = ({
 
   const handleAddItem = async () => {
     inputFields[headers[0]] = "temp_id"
-    const response = await addItem(inputFields); // Use the inputFields state
+    const response = await addItem(currentUserId, inputFields); // Use the inputFields state
     setItems([...items, response]);
     setOpenAddDialog(false); // Close the add dialog
     setInputFields({}); // Clear the input fields
@@ -83,9 +85,8 @@ const DataTable: React.FC<TableProps> = ({
 
   const handleRemoveItem = async () => {
     if (!selectedItem) return;
-    const aaa = selectedItem[headers[0]]
-    await removeItem(aaa);
-    setItems(await fetchItems());
+    await removeItem(currentUserId, selectedItem[headers[0]]);
+    setItems(await fetchItems(currentUserId));
     handleClose();
   };
 

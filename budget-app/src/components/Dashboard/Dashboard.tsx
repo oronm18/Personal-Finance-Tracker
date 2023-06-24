@@ -15,19 +15,21 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Dashboard: React.FC = () => {
-  const classes = useStyles();
+interface DashboardProps {
+  currentUserId: string;
+}
 
+const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
   return (
-    <Box className={classes.borderBox}>
-      <Typography align="center" className={classes.title} variant="h5">Dashboard</Typography>
+    <Box>
+      <Typography align="center" variant="h5">Dashboard</Typography>
       <Box mt={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
-            <TransactionTable />
+            <TransactionTable currentUserId={currentUserId} />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <SavingsGoalTable />
+            <SavingsGoalTable currentUserId={currentUserId} />
           </Grid>
         </Grid>
       </Box>
