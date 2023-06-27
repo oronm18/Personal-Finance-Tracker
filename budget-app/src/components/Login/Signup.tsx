@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { makeStyles, Typography, TextField, Button } from '@material-ui/core';
-import { login } from '../../api'; // Import the login function from api.ts
+import { signup } from '../../api'; // Import the signup function from api.ts
 import { useNavigate, Link } from 'react-router-dom';
-import { User } from '../User/User'
+import { User } from '../User/User';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,18 +29,18 @@ const useStyles = makeStyles((theme) => ({
     width: '200px',
     marginTop: theme.spacing(2),
   },
-  signUpLink: {
+  loginLink: {
     marginTop: theme.spacing(2),
     color: theme.palette.primary.main,
     textDecoration: 'none',
   },
 }));
 
-interface LoginProps {
-  onLogin: (userId: string) => void;
-}
+interface SignupProps {
+    onSignup: (userId: string) => void;
+  }  
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Signup: React.FC<SignupProps> = ({ onSignup }) => {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -49,17 +49,18 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const user: User = {user_id: "undefined", username: username, password: password}
-      const response = await login(user);
+    const user: User = {user_id: "undefined", username: username, password: password}
+      const response = await signup(user);
+      console.log(response)
       if (response.user_id !== null) {
-        onLogin(response.user_id);
-        console.log('Login successful');
+        console.log('Signup successful');
+        onSignup(response.user_id)
         navigate('/dashboard');
       } else {
-        console.log('Invalid username or password');
+        console.log('Signup failed');
       }
     } catch (error) {
-      console.log('An error occurred during login');
+      console.log('An error occurred during signup');
     }
     // Reset form fields
     setUsername('');
@@ -69,7 +70,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div className={classes.root}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Login
+        Sign Up
       </Typography>
       <form className={classes.form} onSubmit={handleSubmit}>
         <TextField
@@ -91,14 +92,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           color="primary"
           type="submit"
         >
-          Login
+          Sign Up
         </Button>
-        <Link to="/signup" className={classes.signUpLink}>
-          Create an account
+        <Link to="/login" className={classes.loginLink}>
+          Already have an account? Login here
         </Link>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Signup;

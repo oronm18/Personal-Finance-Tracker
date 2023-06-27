@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 export const fetchTransactions = async (user_id: string) => {
-  const response = await api.get(`/transactions?user_id=${user_id}`); 
+  const response = await api.get(`/transactions?user_id=${user_id}`);
   return response.data;
 };
 
@@ -42,3 +42,7 @@ export const login = async (user: User) => {
   return response.data;
 };
 
+export const signup = async (user: User) => {
+  const response = await api.post(`/signup`, user);
+  return response.data;
+};

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardMedia, Grid, Typography, Button, Container, Switch, useMediaQuery, Box } from '@material-ui/core';
+import { Card, CardContent, CardMedia, Grid, Typography, Button, Container, Switch, useMediaQuery, Box, makeStyles, useTheme } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import TransactionImage from '../../assets/transaction.jpg';
 import SavingsGoalImage from '../../assets/saving.jpg';
@@ -10,11 +10,22 @@ const features = [
   { title: 'Set Savings Goals', description: 'Set and track progress towards your savings goals.', image: SavingsGoalImage },
 ];
 
-const Home: React.FC = () => {
+interface HomeProps {
+  currentUserId: string;
+}
+
+const Home: React.FC<HomeProps> = ({ currentUserId }) => {
   const navigate = useNavigate();
-  const navigateToDashboard = () => {
-    navigate('/login');
+  const navigateToDashboard = (user_id: string) => {
+    console.log(user_id);
+    if('' === user_id){
+      navigate('/login');
+    }
+    else{
+      navigate('/dashboard')
+    }
   };
+  const theme = useTheme(); // Access the current theme
 
   return (
     <Box>
@@ -26,7 +37,7 @@ const Home: React.FC = () => {
           {features.map((feature, index) => (
             
             <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card className="Feature-card">
+              <Card className="Feature-card" style={{ backgroundColor: theme.palette.background.default }}>
                 <CardMedia
                   component="img"
                   alt={feature.title}
@@ -51,7 +62,7 @@ const Home: React.FC = () => {
     color="primary"
     size="large"
     className="Home-cta"
-    onClick={navigateToDashboard}
+    onClick={() => {navigateToDashboard(currentUserId)}}
   >
     Get Started
   </Button>

@@ -1,33 +1,65 @@
+import React from 'react';
 import { fetchTransactions, addTransaction, removeTransaction } from '../../api';
 import DataTable from './DataTable';
+import { createDynamicType, Field} from '../../Utils';
 
-export const TransactionKeys = {
-  transaction_id: '',
-  name: '',
-  amount: '',
-  category: '',
-  date: '',
-};
+const transactionFields: Field[] = [
+  {
+    id: 'transaction_id',
+    display_name: 'Transaction ID',
+    type: 'string',
+    default: '',
+  },
+  {
+    id: 'name',
+    display_name: 'Name',
+    type: 'string',
+    default: '',
+  },
+  {
+    id: 'amount',
+    display_name: 'Amount',
+    type: 'number',
+    default: 0,
+  },
+  {
+    id: 'category',
+    display_name: 'Category',
+    type: 'string',
+    default: '',
+  },
+  {
+    id: 'date',
+    display_name: 'Date',
+    type: 'string',
+    default: '',
+  },
+];
 
-export type Transaction = typeof TransactionKeys;
+const transactionInstance = createDynamicType(transactionFields);
+export type Transaction = typeof transactionInstance;
 
-const transactionKeys: (keyof Transaction)[] = Object.keys(TransactionKeys) as (keyof Transaction)[];
+const transactionKeys = transactionFields.map((field) => field.id);
 
-interface TransactionTableProps {
+interface TransactionsProps {
   currentUserId: string;
 }
 
-const TransactionTable: React.FC<TransactionTableProps> = ({ currentUserId }) => {
+const TransactionsTable: React.FC<TransactionsProps> = ({ currentUserId }) => {
+  const defaultItem = createDynamicType(transactionFields);
+
   return (
     <DataTable
       fetchItems={fetchTransactions}
-      addItem={addTransaction}
+      addItem={(item: Transaction, userId: string) => addTransaction(userId, item)}
       removeItem={removeTransaction}
-      headers={transactionKeys.map(key => key)}
-      itemDetails={(item: any) => transactionKeys.map(key => ({ name: key, value: item[key]}))}
+      headers={transactionKeys}
+      fields={transactionFields}
+      defaultItem={defaultItem}
       currentUserId={currentUserId}
+      idFieldId='transaction_id'
     />
   );
 };
 
-export default TransactionTable;
+export default TransactionsTable;

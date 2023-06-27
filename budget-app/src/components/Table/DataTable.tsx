@@ -1,194 +1,111 @@
 import React, { useState, useEffect } from 'react';
-import DialogContentText from '@material-ui/core/DialogContentText';
-
-import {
-  makeStyles,
-  Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-} from '@material-ui/core';
+import { makeStyles, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
+import ViewIcon from '@material-ui/icons/Visibility';
+import AddDialog from '../Dialog/AddDialog';
+import DetailDialog from '../Dialog/DetailDialog';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from 'recharts';
+import { Field, createDynamicType } from '../../Utils';
 
 const useStyles = makeStyles((theme) => ({
-  tableContainer: {
-    marginBottom: theme.spacing(3),
-  },
-  dialogContent: {
-    display: 'flex',
-    flexDirection: 'column',
+  table: {
+    minWidth: 650,
   },
 }));
 
-interface TableProps {
-  fetchItems: (user_id: string) => Promise<TableItem[]>;
-  addItem: (user_id: string, item: any) => Promise<TableItem>;
-  removeItem: (user_id: string, item_name: any) => Promise<void>;
+interface DataTableProps {
+  fetchItems: (userId: string) => Promise<any[]>;
+  addItem: (item: any, userId: string) => Promise<void>;
+  removeItem: (itemId: string, userId: string) => Promise<void>;
   headers: string[];
-  itemDetails: (item: TableItem) => { name: string; value: string | number }[];
+  fields: Field[];
+  defaultItem: any;
   currentUserId: string;
+  idFieldId: string;
 }
 
-interface TableItem {
-  [key: string]: string | number;
-}
-
-const DataTable: React.FC<TableProps> = ({
-  fetchItems,
-  addItem,
-  removeItem,
-  headers,
-  itemDetails,
-  currentUserId,
-}) => {
+const DataTable: React.FC<DataTableProps> = ({ fetchItems, addItem, removeItem, headers, fields, defaultItem, currentUserId, idFieldId }) => {
   const classes = useStyles();
-  const [items, setItems] = useState<TableItem[]>([]);
-  const [selectedItem, setSelectedItem] = useState<TableItem | null>(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [inputFields, setInputFields] = useState<{ [key: string]: string | number }>({});
-  const [openAddDialog, setOpenAddDialog] = useState(false); // New state for handling add dialog
+  const [items, setItems] = useState<any[]>([]);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setItems(await fetchItems(currentUserId));
-    };
-    fetchData();
+    getItems();
   }, []);
 
-  
-
-  const handleAddItem = async () => {
-    inputFields[headers[0]] = "temp_id"
-    const response = await addItem(currentUserId, inputFields); // Use the inputFields state
-    setItems([...items, response]);
-    setOpenAddDialog(false); // Close the add dialog
-    setInputFields({}); // Clear the input fields
+  const getItems = async () => {
+    const fetchedItems = await fetchItems(currentUserId);
+    setItems(fetchedItems);
   };
 
-  const handleRowClick = (item: TableItem) => {
+  const handleAddItem = async (item: any) => {
+    await addItem(item, currentUserId);
+    getItems();
+  };
+
+  const handleRemoveItem = async (itemId: string) => {
+    await removeItem(itemId, currentUserId);
+    getItems();
+  };
+
+  const handleViewItemDetails = (item: any) => {
     setSelectedItem(item);
-    setOpenDialog(true);
+    setDetailDialogOpen(true);
   };
 
-  const handleClose = () => {
-    setOpenDialog(false);
-  };
-
-  const handleRemoveItem = async () => {
-    if (!selectedItem) return;
-    await removeItem(currentUserId, selectedItem[headers[0]]);
-    setItems(await fetchItems(currentUserId));
-    handleClose();
-  };
-
-  const renderDialog = () => {
-    if (!selectedItem) return null;
-    const details = itemDetails(selectedItem);
-
-    return (
-      <Dialog open={openDialog} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Item Details</DialogTitle>
-        <DialogContent className={classes.dialogContent}>
-          {details.map((detail, index) => (
-            <TextField
-              key={index}
-              autoFocus={index === 0}
-              margin="dense"
-              id={detail.name}
-              label={detail.name}
-              type={typeof detail.value === 'number' ? 'number' : 'text'}
-              fullWidth
-              value={detail.value}
-              disabled
-            />
-          ))}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleRemoveItem} color="secondary">
-            Remove
-          </Button>
-          <Button onClick={handleClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
-const renderAddDialog = () => (
-  <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} aria-labelledby="form-dialog-title">
-    <DialogTitle id="form-dialog-title">Add Item</DialogTitle>
-    <DialogContent>
-      <DialogContentText>Enter the details for the new item:</DialogContentText>
-      {headers.map((header, index) => ( header != headers[0] &&
-        <TextField
-          key={index}
-          autoFocus={index === 0}
-          margin="dense"
-          id={header}
-          label={header}
-          type={header.toLowerCase() === 'date' ? 'date' : 'text'} // Add condition for date field
-          fullWidth
-          InputLabelProps={header.toLowerCase() === 'date' ? { shrink: true } : {}} // For proper rendering of date field
-          value={inputFields[header] || ''}
-          onChange={(e) => setInputFields({ ...inputFields, [header]: e.target.value })}
-        />
-      ))}
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={handleAddItem} color="primary">
-        Add
-      </Button>
-      <Button onClick={() => setOpenAddDialog(false)} color="primary">
-        Cancel
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
   return (
-    <Box>
-      <Paper>
-        <TableContainer className={classes.tableContainer}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                {headers.map((header, index) => (
-                  <TableCell key={index}>{header}</TableCell>
-                ))}
+    <Box mt={3}>
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              {headers.map((header) => {
+                if (header === idFieldId) {
+                  return null; // Skip rendering the ID field in the table header
+                }
+                return <TableCell key={header}>{header}</TableCell>;
+              })}
+              <TableCell align="right">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.map((item) => (
+              <TableRow key={item[headers[0]]}>
+                {fields.map((field) => {
+                  if (field.id === idFieldId) {
+                    return null; // Skip rendering the ID field in the table row
+                  }
+                  return <TableCell key={field.id}>{item[field.id]}</TableCell>;
+                })}
+                <TableCell align="right">
+                  <Tooltip title="Delete">
+                    <IconButton aria-label="delete" onClick={() => handleRemoveItem(item[headers[0]])}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="View">
+                    <IconButton aria-label="view" onClick={() => handleViewItemDetails(item)}>
+                      <ViewIcon />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.map((item, index) => (
-                <TableRow key={index} onClick={() => handleRowClick(item)}>
-                  {headers.map((header, idx) => (
-                    <TableCell key={idx} component={idx === 0 ? "th" : "td"} scope="row">
-                      {
-                        header == headers[0] &&
-                        (itemDetails(item)[idx].value as string).slice(-4) ||
-                        header != headers[0] &&
-                        itemDetails(item)[idx].value
-                      }
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-      <Button variant="contained" color="primary" onClick={() => setOpenAddDialog(true)}>
-        Add Item
-      </Button>
-      {renderAddDialog()} 
-      {renderDialog()}
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box mt={2} display="flex" justifyContent="flex-end">
+        <Tooltip title="Add">
+          <IconButton aria-label="add" onClick={() => setAddItemDialogOpen(true)}>
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <AddDialog open={addItemDialogOpen} handleClose={() => setAddItemDialogOpen(false)} handleSubmit={handleAddItem} fields={fields} idFieldId={idFieldId} />
+      <DetailDialog open={detailDialogOpen} handleClose={() => setDetailDialogOpen(false)} item={selectedItem} fields={fields} idFieldId={idFieldId} />
     </Box>
   );
 };

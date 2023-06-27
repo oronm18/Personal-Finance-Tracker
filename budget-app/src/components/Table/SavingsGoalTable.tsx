@@ -1,31 +1,56 @@
 import React from 'react';
 import { fetchSavingsGoals, addSavingsGoal, removeSavingsGoal } from '../../api';
 import DataTable from './DataTable';
+import { createDynamicType, Field} from '../../Utils';
 
-export const SavingsGoalKeys = {
-  saving_goal_id: '',
-  name: '',
-  current: '',
-  target: '',
-};
-
-export type SavingsGoal = typeof SavingsGoalKeys;
-
-const savingsGoalKeys: (keyof SavingsGoal)[] = Object.keys(SavingsGoalKeys) as (keyof SavingsGoal)[];
+const savingsGoalFields: Field[] = [
+  {
+    id: 'saving_goal_id',
+    display_name: 'ID',
+    type: 'string',
+    default: '',
+  },
+  {
+    id: 'name',
+    display_name: 'Name',
+    type: 'string',
+    default: '',
+  },
+  {
+    id: 'current',
+    display_name: 'Current',
+    type: 'number',
+    default: 0,
+  },
+  {
+    id: 'target',
+    display_name: 'Target',
+    type: 'number',
+    default: 0,
+  },
+];
+// export type SavingGoal = typeof createDynamicType(savingsGoalFields)
+const savingsGoalKeys = savingsGoalFields.map((field) => field.id);
+const savingsGoalInstance = createDynamicType(savingsGoalFields);
+export type SavingsGoal = typeof savingsGoalInstance;
 
 interface SavingsGoalTableProps {
   currentUserId: string;
 }
 
 const SavingsGoalTable: React.FC<SavingsGoalTableProps> = ({ currentUserId }) => {
+  const defaultItem = createDynamicType(savingsGoalFields);
+
   return (
     <DataTable
       fetchItems={fetchSavingsGoals}
-      addItem={addSavingsGoal}
+      addItem={(item: SavingsGoal, userId: string) => addSavingsGoal(userId, item)}
       removeItem={removeSavingsGoal}
-      headers={savingsGoalKeys.map(key => key)}
-      itemDetails={(item: any) => savingsGoalKeys.map(key => ({ name: key, value: item[key] }))}
+      headers={savingsGoalKeys}
+      fields={savingsGoalFields}
+      defaultItem={defaultItem}
       currentUserId={currentUserId}
+      idFieldId="saving_goal_id"
     />
   );
 };

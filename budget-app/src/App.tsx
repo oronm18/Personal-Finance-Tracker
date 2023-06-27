@@ -4,6 +4,8 @@ import Layout from './components/Layout';
 import Home from './components/Home/Home';
 import Dashboard from './components/Dashboard/Dashboard';
 import Login from './components/Login/Login';
+import Signup from './components/Login/Signup';
+import Budgeting from './components/Budgeting/Budgeting';
 
 function App() {
   const [userId, setUserId] = useState<string>(() => {
@@ -16,20 +18,18 @@ function App() {
     sessionStorage.setItem('userId', userId);
   }, [userId]);
 
-  const handleLogin = (userId: string) => {
-    setUserId(userId);
-  };
-
   return (
     <Router>
-      <Layout>
+      <Layout setUserId={setUserId} userId={userId}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home currentUserId={userId} />} />
           <Route
             path="/dashboard"
-            element={<Dashboard currentUserId={userId} onLogin={handleLogin} />}
+            element={<Dashboard currentUserId={userId} />}
           />
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/login" element={<Login onLogin={setUserId} />} />
+          <Route path="/signup" element={<Signup onSignup={setUserId} />} />
+          <Route path="/budgeting" element={<Budgeting />} />
         </Routes>
       </Layout>
     </Router>

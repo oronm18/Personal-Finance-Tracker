@@ -1,16 +1,16 @@
 import React, { useState, useEffect, ReactNode } from 'react';
-import { Switch, Button, useMediaQuery } from '@material-ui/core';
+import { Switch, Button, useMediaQuery, Box } from '@material-ui/core';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import AppLogo from '../assets/logo.png';
 
-export const UserIdTemp: string = "123"
-
 interface LayoutProps {
   children: ReactNode;
+  userId: string;
+  setUserId: (userId: string) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -18,62 +18,62 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const savedDarkMode = sessionStorage.getItem('darkMode');
     return savedDarkMode !== null ? JSON.parse(savedDarkMode) : prefersDarkMode;
   });
+
   useEffect(() => {
     // Save dark mode state to sessionStorage
     sessionStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
-const theme = createTheme({
-  palette: {
-    type: darkMode ? 'dark' : 'light',
-  },
-  typography: {
-    h2: {
-      color: darkMode ? '#f0f0f0' : '#333',
+  const theme = createTheme({
+    palette: {
+      type: darkMode ? 'dark' : 'light',
     },
-    h4: {
-      color: darkMode ? '#f0f0f0' : '#333',
-    },
-    h5: {
-      color: darkMode ? '#f0f0f0' : '#333',
-    },
-  },
-  overrides: {
-    MuiTable: {
-      root: {
-        backgroundColor: darkMode ? '#888' : '#f0f0f0',
+    typography: {
+      h2: {
+        color: darkMode ? '#f0f0f0' : '#333',
       },
-    },
-    MuiTableCell: {
-      root: {
+      h4: {
+        color: darkMode ? '#f0f0f0' : '#333',
+      },
+      h5: {
         color: darkMode ? '#f0f0f0' : '#333',
       },
     },
-    MuiTableHead: {
-      root: {
-        backgroundColor: darkMode ? '#666' : '#ccc',
+    overrides: {
+      MuiTable: {
+        root: {
+          backgroundColor: darkMode ? '#888' : '#f0f0f0',
+        },
       },
-    },
-    MuiTableRow: {
-      root: {
-        '&:hover': {
-          backgroundColor: darkMode ? '#444' : '#ddd',
+      MuiTableCell: {
+        root: {
+          color: darkMode ? '#f0f0f0' : '#333',
+        },
+      },
+      MuiTableHead: {
+        root: {
+          backgroundColor: darkMode ? '#666' : '#ccc',
+        },
+      },
+      MuiTableRow: {
+        root: {
+          '&:hover': {
+            backgroundColor: darkMode ? '#444' : '#ddd',
+          },
+        },
+      },
+      MuiTextField: {
+        root: {
+          color: darkMode ? '#f0f0f0' : '#333',
+        },
+      },
+      MuiTableContainer: {
+        root: {
+          width: '100%',
         },
       },
     },
-    MuiTextField: {
-      root: {
-        color: darkMode ? '#f0f0f0' : '#333',
-      },
-    },
-    MuiTableContainer: {
-      root: {
-        width: '100%',
-      },
-    },
-  },
-});
-
+  });
 
   useEffect(() => {
     const body = document.getElementsByTagName('body')[0];
@@ -88,11 +88,25 @@ const theme = createTheme({
     navigate('/');
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem('userId');
+    setUserId('');
+    navigate('/login');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
+  const handleSignup = () => {
+    navigate('/signup');
+  };
+
   return (
     <ThemeProvider theme={theme}>
-      <div>
+      <Box>
         {/* Top bar */}
-        <div
+        <Box
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -101,21 +115,40 @@ const theme = createTheme({
             color: darkMode ? '#f0f0f0' : '#333',
             padding: '10px',
             position: 'fixed',
-            top: '0',
-            left: '0',
-            right: '0',
+            top: 0,
+            left: 0,
+            right: 0,
             zIndex: 9999,
           }}
         >
           {/* Logo or app title */}
-          <div>
-            <Button color="primary" onClick={navigateToHome}>
-              <img src={AppLogo} alt="App Logo" style={{ height: '40px' }} />
-            </Button>
-          </div>
+          <Button color="primary" onClick={navigateToHome}>
+            <img src={AppLogo} alt="App Logo" style={{ height: '40px' }} />
+          </Button>
 
-          {/* Light Mode button */}
-          <div>
+          {/* Login and Dark Mode buttons */}
+          
+          <Box>
+          {location.pathname !== '/login' ? (
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              onClick={'' === userId ? handleLogin : handleLogout}
+              style={{ marginRight: '8px' }}
+            >
+              {'' === userId ? 'Login' : 'Logout'}
+            </Button>
+            ): 
+            <Button
+            variant="contained"
+            color="primary"
+            size="medium"
+            onClick={handleSignup}
+            style={{ marginRight: '8px' }}
+          >
+            {'Sign Up'}
+          </Button>}
             <Button
               variant="contained"
               color="primary"
@@ -124,11 +157,11 @@ const theme = createTheme({
             >
               {darkMode ? 'Light Mode' : 'Dark Mode'}
             </Button>
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         {/* Main content */}
-        <div style={{ marginTop: '80px', paddingTop: '5px' }}>{children}</div>
+        <Box style={{ marginTop: '80px', paddingTop: '5px' }}>{children}</Box>
 
         {/* Back to home button */}
         {location.pathname !== '/' && (
@@ -150,7 +183,7 @@ const theme = createTheme({
             Back to Home
           </Button>
         )}
-      </div>
+      </Box>
     </ThemeProvider>
   );
 };
