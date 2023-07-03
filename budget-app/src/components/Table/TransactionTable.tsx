@@ -1,5 +1,5 @@
 import React from 'react';
-import { fetchTransactions, addTransaction, removeTransaction } from '../../api';
+import { fetchTransactions, addTransaction, removeTransaction, updateTransaction } from '../../api';
 import DataTable from './DataTable';
 import { createDynamicType, Field} from '../../Utils';
 
@@ -31,7 +31,7 @@ const transactionFields: Field[] = [
   {
     id: 'date',
     display_name: 'Date',
-    type: 'string',
+    type: 'date',
     default: '',
   },
 ];
@@ -51,7 +51,8 @@ const TransactionsTable: React.FC<TransactionsProps> = ({ currentUserId }) => {
   return (
     <DataTable
       fetchItems={fetchTransactions}
-      addItem={(item: Transaction, userId: string) => addTransaction(userId, item)}
+      addItem={addTransaction}
+      updateItem={updateTransaction}
       removeItem={removeTransaction}
       headers={transactionKeys}
       fields={transactionFields}

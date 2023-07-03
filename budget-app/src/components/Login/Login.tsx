@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { makeStyles, Typography, TextField, Button } from '@material-ui/core';
 import { login } from '../../api'; // Import the login function from api.ts
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { User } from '../User/User'
+import { handleNavigate } from '../../Utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,7 +45,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +54,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       if (response.user_id !== null) {
         onLogin(response.user_id);
         console.log('Login successful');
-        navigate('/dashboard');
+        handleNavigate('/dashboard')
       } else {
         console.log('Invalid username or password');
       }

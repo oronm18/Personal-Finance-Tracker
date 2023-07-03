@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardMedia, Grid, Typography, Button, Container, Switch, useMediaQuery, Box, makeStyles, useTheme } from '@material-ui/core';
-import { useNavigate } from 'react-router-dom';
 import TransactionImage from '../../assets/transaction.jpg';
 import SavingsGoalImage from '../../assets/saving.jpg';
 import './Home.css';
+import { handleNavigate } from '../../Utils';
 
 const features = [
   { title: 'Manage Your Budget', description: 'Keep track of your income and expenses in one place.', image: TransactionImage },
@@ -15,14 +15,12 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ currentUserId }) => {
-  const navigate = useNavigate();
   const navigateToDashboard = (user_id: string) => {
-    console.log(user_id);
     if('' === user_id){
-      navigate('/login');
+      handleNavigate('/login');
     }
     else{
-      navigate('/dashboard')
+      handleNavigate('/dashboard')
     }
   };
   const theme = useTheme(); // Access the current theme

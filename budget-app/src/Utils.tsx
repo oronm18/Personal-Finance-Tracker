@@ -13,3 +13,7 @@ export interface Field {
   
     return typeKeys;
   }
+
+  export const handleNavigate = (path: string) => {
+    window.location.href = path; // Navigate and refresh the page
+  };

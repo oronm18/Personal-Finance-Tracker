@@ -1,8 +1,10 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { Switch, Button, useMediaQuery, Box } from '@material-ui/core';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
-import AppLogo from '../assets/logo.png';
+import AppLogo from '../../assets/logo.png';
+import { handleNavigate } from '../../Utils';
+import { createThemeColored, darkTheme, lightTheme } from './theme';
 
 interface LayoutProps {
   children: ReactNode;
@@ -11,7 +13,6 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
-  const navigate = useNavigate();
   const location = useLocation();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [darkMode, setDarkMode] = useState(() => {
@@ -19,61 +20,12 @@ const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
     return savedDarkMode !== null ? JSON.parse(savedDarkMode) : prefersDarkMode;
   });
 
+  const theme = createThemeColored(darkMode);
+
   useEffect(() => {
     // Save dark mode state to sessionStorage
     sessionStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
-
-  const theme = createTheme({
-    palette: {
-      type: darkMode ? 'dark' : 'light',
-    },
-    typography: {
-      h2: {
-        color: darkMode ? '#f0f0f0' : '#333',
-      },
-      h4: {
-        color: darkMode ? '#f0f0f0' : '#333',
-      },
-      h5: {
-        color: darkMode ? '#f0f0f0' : '#333',
-      },
-    },
-    overrides: {
-      MuiTable: {
-        root: {
-          backgroundColor: darkMode ? '#888' : '#f0f0f0',
-        },
-      },
-      MuiTableCell: {
-        root: {
-          color: darkMode ? '#f0f0f0' : '#333',
-        },
-      },
-      MuiTableHead: {
-        root: {
-          backgroundColor: darkMode ? '#666' : '#ccc',
-        },
-      },
-      MuiTableRow: {
-        root: {
-          '&:hover': {
-            backgroundColor: darkMode ? '#444' : '#ddd',
-          },
-        },
-      },
-      MuiTextField: {
-        root: {
-          color: darkMode ? '#f0f0f0' : '#333',
-        },
-      },
-      MuiTableContainer: {
-        root: {
-          width: '100%',
-        },
-      },
-    },
-  });
 
   useEffect(() => {
     const body = document.getElementsByTagName('body')[0];
@@ -85,21 +37,21 @@ const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
   };
 
   const navigateToHome = () => {
-    navigate('/');
+    handleNavigate('/');
   };
 
   const handleLogout = () => {
     sessionStorage.removeItem('userId');
     setUserId('');
-    navigate('/login');
+    handleNavigate('/login');
   };
 
   const handleLogin = () => {
-    navigate('/login');
+    handleNavigate('/login');
   };
 
   const handleSignup = () => {
-    navigate('/signup');
+    handleNavigate('/signup');
   };
 
   return (

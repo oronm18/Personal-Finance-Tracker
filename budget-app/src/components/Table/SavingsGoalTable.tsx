@@ -1,5 +1,5 @@
 import React from 'react';
-import { fetchSavingsGoals, addSavingsGoal, removeSavingsGoal } from '../../api';
+import { fetchSavingsGoals, addSavingsGoal, removeSavingsGoal, updateSavingsGoal } from '../../api';
 import DataTable from './DataTable';
 import { createDynamicType, Field} from '../../Utils';
 
@@ -44,7 +44,8 @@ const SavingsGoalTable: React.FC<SavingsGoalTableProps> = ({ currentUserId }) =>
   return (
     <DataTable
       fetchItems={fetchSavingsGoals}
-      addItem={(item: SavingsGoal, userId: string) => addSavingsGoal(userId, item)}
+      addItem={addSavingsGoal}
+      updateItem={updateSavingsGoal}
       removeItem={removeSavingsGoal}
       headers={savingsGoalKeys}
       fields={savingsGoalFields}

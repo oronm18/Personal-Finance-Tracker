@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { makeStyles, Typography, TextField, Button } from '@material-ui/core';
 import { signup } from '../../api'; // Import the signup function from api.ts
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { User } from '../User/User';
+import { handleNavigate } from '../../Utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,18 +45,16 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
     const user: User = {user_id: "undefined", username: username, password: password}
       const response = await signup(user);
-      console.log(response)
       if (response.user_id !== null) {
         console.log('Signup successful');
         onSignup(response.user_id)
-        navigate('/dashboard');
+        handleNavigate('/dashboard');
       } else {
         console.log('Signup failed');
       }
