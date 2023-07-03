@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import Login from './components/Login/Login';
 import Signup from './components/Login/Signup';
 import Budgeting from './components/Budgeting/Budgeting';
+import { ThemeProviderComponent } from './components/Layout/ThemeContext';
 
 function App() {
   const [userId, setUserId] = useState<string>(() => {
@@ -20,18 +21,20 @@ function App() {
 
   return (
     <Router>
-      <Layout setUserId={setUserId} userId={userId}>
-        <Routes>
-          <Route path="/" element={<Home currentUserId={userId} />} />
-          <Route
-            path="/dashboard"
-            element={<Dashboard currentUserId={userId} />}
-          />
-          <Route path="/login" element={<Login onLogin={setUserId} />} />
-          <Route path="/signup" element={<Signup onSignup={setUserId} />} />
-          <Route path="/budgeting" element={<Budgeting />} />
-        </Routes>
-      </Layout>
+      <ThemeProviderComponent>
+        <Layout setUserId={setUserId} userId={userId}>
+          <Routes>
+            <Route path="/" element={<Home currentUserId={userId} />} />
+            <Route
+              path="/dashboard"
+              element={<Dashboard currentUserId={userId} />}
+            />
+            <Route path="/login" element={<Login onLogin={setUserId} />} />
+            <Route path="/signup" element={<Signup onSignup={setUserId} />} />
+            <Route path="/budgeting" element={<Budgeting />} />
+          </Routes>
+        </Layout>
+      </ThemeProviderComponent>
     </Router>
   );
 }

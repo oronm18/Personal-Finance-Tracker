@@ -1,10 +1,11 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect, ReactNode, useContext } from 'react';
 import { Switch, Button, useMediaQuery, Box } from '@material-ui/core';
 import { useLocation } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import AppLogo from '../../assets/logo.png';
 import { handleNavigate } from '../../Utils';
-import { createThemeColored, darkTheme, lightTheme } from './theme';
+import { createThemeColored } from './theme';
+import { useThemeContext } from './ThemeContext';
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,12 +14,8 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
+  const { darkMode, setDarkMode } = useThemeContext();
   const location = useLocation();
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedDarkMode = sessionStorage.getItem('darkMode');
-    return savedDarkMode !== null ? JSON.parse(savedDarkMode) : prefersDarkMode;
-  });
 
   const theme = createThemeColored(darkMode);
 
