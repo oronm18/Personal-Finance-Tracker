@@ -61,11 +61,12 @@ const UnifiedDialog: React.FC<UnifiedDialogProps> = ({
             <TextField
             key={field.id}
             name={field.id}
-            label={field.display_name}
+            label={"Date" !== field.display_name ? field.display_name : " "}
             value={dialogItem[field.id] || ''}
             type={field.type}
             onChange={handleChange}
             fullWidth
+            
             />
           ))
         );
@@ -87,9 +88,8 @@ const UnifiedDialog: React.FC<UnifiedDialogProps> = ({
         {renderDialogContent()}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary"> Cancel </Button>
+        <Button onClick={handleClose} color="primary"> { type !== 'view' ? "Cancel" : "Close" } </Button>
         { type !== 'view' && <Button onClick={submitForm} color="primary"> {type} </Button> }
-        { type === 'edit' && <Button onClick={submitForm} color="primary"> {type} </Button> }
       </DialogActions>
     </Dialog>
   );
