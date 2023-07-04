@@ -3,7 +3,7 @@ import { makeStyles, Typography, TextField, Button } from '@material-ui/core';
 import { login } from '../../api'; // Import the login function from api.ts
 import { Link } from 'react-router-dom';
 import { User } from '../User/User'
-import { handleNavigate } from '../../Utils';
+import { handleRefreshNavigate } from '../../Utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +54,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       if (response.user_id !== null) {
         onLogin(response.user_id);
         console.log('Login successful');
-        handleNavigate('/dashboard')
+        handleRefreshNavigate('/dashboard')
       } else {
         console.log('Invalid username or password');
       }

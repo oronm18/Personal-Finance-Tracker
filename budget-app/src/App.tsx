@@ -31,7 +31,7 @@ function App() {
             />
             <Route path="/login" element={<Login onLogin={setUserId} />} />
             <Route path="/signup" element={<Signup onSignup={setUserId} />} />
-            <Route path="/budgeting" element={<Budgeting />} />
+            <Route path="/budgeting" element={<Budgeting userId={userId} />} />
           </Routes>
         </Layout>
       </ThemeProviderComponent>

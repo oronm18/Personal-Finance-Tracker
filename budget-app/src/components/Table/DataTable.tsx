@@ -3,7 +3,7 @@ import { makeStyles, Box, Table, TableBody, TableCell, TableContainer, TableHead
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ViewIcon from '@material-ui/icons/Visibility';
-import { Field, handleNavigate } from '../../Utils';
+import { Field } from '../../Utils';
 import UnifiedDialog from '../Dialog/UnifiedDialog';
 import { Edit } from '@material-ui/icons';
 

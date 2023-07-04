@@ -1,84 +1,188 @@
-// Budgeting.tsx
-import React from 'react';
-import { Box, Typography } from '@material-ui/core';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+// React Imports
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// We will use this color scheme for our charts
+// Material-UI Imports
+import { 
+    Box, 
+    Typography, 
+    Button, 
+    Card, 
+    CardContent, 
+    IconButton, 
+    makeStyles 
+} from '@material-ui/core';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+
+// Recharts Imports
+import { 
+    BarChart, 
+    Bar, 
+    XAxis, 
+    YAxis, 
+    PieChart, 
+    Pie, 
+    Cell, 
+    Tooltip, 
+    Legend, 
+    ResponsiveContainer 
+} from 'recharts';
+
+// API and Utilities Imports
+import { fetchSavingsGoals, fetchTransactions } from '../../api';
+import { handleRefreshNavigate } from '../../Utils';
+
+// Styling Constants
+const useStyles = makeStyles((theme) => ({
+    root: {
+        backgroundColor: '#f4f6f8',
+        minHeight: '100vh',
+    },
+    card: {
+        margin: 'auto',
+        borderRadius: 12,
+        padding: theme.spacing(3),
+    },
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    button: {
+        backgroundColor: '#1c313a',
+        color: '#fff',
+        '&:hover': {
+            backgroundColor: '#596164',
+        },
+    },
+}));
+
+// Chart Colors
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-// Assume you have data like this for expenses. You should fetch actual data from your API.
-const expenseData = [
-  { name: 'Rent', value: 400 },
-  { name: 'Grocery', value: 300 },
-  { name: 'Entertainment', value: 200 },
-  { name: 'Transport', value: 100 },
-];
+// Component Interface
+interface BudgetingProps {
+    userId: string;
+}
 
-// Assume you have data like this for savings. You should fetch actual data from your API.
-const savingsData = [
-  { name: 'Goal', value: 1000 },
-  { name: 'Current', value: 400 },
-];
+// Budgeting Component
+const Budgeting: React.FC<BudgetingProps> = ({ userId }) => {
+    const navigate = useNavigate();
+    const classes = useStyles();
+    const [transactionData, setTransactionData] = useState([]);
+    const [savingsData, setSavingsData] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
-const Budgeting: React.FC = () => {
+    // Fetch user data on mount and userId change
+    useEffect(() => {
+        if (!userId) {
+            handleRefreshNavigate('/login');
+        }
+
+        const fetchData = async () => {
+            const transactions = await fetchTransactions(userId);
+            setTransactionData(transactions);
+
+            const savingGoals = await fetchSavingsGoals(userId);
+            setSavingsData(savingGoals);
+        };
+
+        fetchData();
+    }, [userId]);
+
+    // Navigation Handlers
+    const handleReturnToDashboard = () => {
+        handleRefreshNavigate('/dashboard');
+    };
+
+    const handlePrev = () => {
+        setCurrentIndex(oldIndex => oldIndex > 0 ? oldIndex - 1 : savingsData.length - 1);
+    };
+  
+    const handleNext = () => {
+        setCurrentIndex(oldIndex => oldIndex + 1 < savingsData.length ? oldIndex + 1 : 0);
+    };
+  
   return (
-    <Box>
-      <Typography align="center" variant="h5">
-        Budgeting
-      </Typography>
-      <Box mt={3}>
-        <Box mb={5}>
-          <Typography align="center" variant="h6">
-            Expense Distribution
-          </Typography>
-          <ResponsiveContainer width="100%" height={400}>
-            <PieChart>
-              <Pie
-                dataKey="value"
-                isAnimationActive={false}
-                data={expenseData}
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                fill="#8884d8"
-                label
-              >
-                {expenseData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </Box>
-        <Box mb={5}>
-          <Typography align="center" variant="h6">
+    <Box className={classes.root}>
+      <Card className={classes.card}>
+        <CardContent>
+          <Box className={classes.header}>
+            <Typography variant="h4">
+              Budgeting
+            </Typography>
+            <Button variant="contained" className={classes.button} onClick={handleReturnToDashboard}>
+              Return to Dashboard
+            </Button>
+          </Box>
+  
+          <Box mb={5}>
+            <Typography align="center" variant="h4">
+              Transactions
+            </Typography>
+            <ResponsiveContainer width="100%" height={400}>
+              <PieChart>
+                <Pie
+                  dataKey="amount"
+                  isAnimationActive={false}
+                  data={transactionData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  fill="#8884d8"
+                  label
+                >
+                  {transactionData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </Box>
+  
+          <Box mb={5}>
+          <Typography align="center" variant="h4">
             Savings Goals
           </Typography>
-          <ResponsiveContainer width="100%" height={400}>
-            <PieChart>
-              <Pie
-                dataKey="value"
-                isAnimationActive={false}
-                data={savingsData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                fill="#8884d8"
-                label
+          {savingsData.length > 0 && (
+                            <Typography align="center" variant="h6" gutterBottom>
+                                {savingsData[currentIndex]["name"]} Goal Progress
+                            </Typography>
+                        )}
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <IconButton onClick={handlePrev}>
+              <ArrowBackIcon />
+            </IconButton>
+            <ResponsiveContainer width="80%" height={400}>
+              <BarChart
+                data={[savingsData[currentIndex]]}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
               >
-                {savingsData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+                <XAxis dataKey="name" />
+                <YAxis domain={[0, 'dataMax']} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="current" fill="#8884d8" />
+                <Bar dataKey="target" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+            <IconButton onClick={handleNext}>
+              <ArrowForwardIcon />
+            </IconButton>
+          </Box>
         </Box>
-      </Box>
+
+
+        </CardContent>
+      </Card>
     </Box>
   );
 };

@@ -4,7 +4,7 @@ import { SavingsGoal } from './components/Table/SavingsGoalTable';
 import { User } from './components/User/User';
 
 const api = axios.create({
-  baseURL: 'http://192.168.10.114:8000',
+  baseURL: 'http://192.168.10.115:8000',
 });
 
 export const fetchTransactions = async (user_id: string) => {

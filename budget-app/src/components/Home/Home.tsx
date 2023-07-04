@@ -3,7 +3,8 @@ import { Card, CardContent, CardMedia, Grid, Typography, Button, Container, Swit
 import TransactionImage from '../../assets/transaction.jpg';
 import SavingsGoalImage from '../../assets/saving.jpg';
 import './Home.css';
-import { handleNavigate } from '../../Utils';
+import { handleRefreshNavigate } from '../../Utils';
+import { useNavigate } from 'react-router-dom';
 
 const features = [
   { title: 'Manage Your Budget', description: 'Keep track of your income and expenses in one place.', image: TransactionImage },
@@ -15,12 +16,14 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ currentUserId }) => {
+  const navigate = useNavigate();
+
   const navigateToDashboard = (user_id: string) => {
     if('' === user_id){
-      handleNavigate('/login');
+      navigate('/login');
     }
     else{
-      handleNavigate('/dashboard')
+      handleRefreshNavigate('/dashboard')
     }
   };
   const theme = useTheme(); // Access the current theme

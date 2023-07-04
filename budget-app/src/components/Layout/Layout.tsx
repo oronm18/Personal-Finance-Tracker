@@ -1,9 +1,9 @@
 import React, { useState, useEffect, ReactNode, useContext } from 'react';
 import { Switch, Button, useMediaQuery, Box } from '@material-ui/core';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import AppLogo from '../../assets/logo.png';
-import { handleNavigate } from '../../Utils';
+import { handleRefreshNavigate } from '../../Utils';
 import { createThemeColored } from './theme';
 import { useThemeContext } from './ThemeContext';
 
@@ -14,6 +14,8 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
+  const navigate = useNavigate();
+
   const { darkMode, setDarkMode } = useThemeContext();
   const location = useLocation();
 
@@ -34,21 +36,27 @@ const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
   };
 
   const navigateToHome = () => {
-    handleNavigate('/');
+    navigate('/');
   };
 
   const handleLogout = () => {
     sessionStorage.removeItem('userId');
     setUserId('');
-    handleNavigate('/login');
+    navigate('/login');
   };
 
   const handleLogin = () => {
-    handleNavigate('/login');
+    navigate('/login');
   };
 
   const handleSignup = () => {
-    handleNavigate('/signup');
+    navigate('/signup');
+  };
+
+  const buttonStyles = {
+    backgroundColor: darkMode ? '#f0f0f0' : '#333',
+    color: darkMode ? '#333' : '#f0f0f0',
+    marginRight: '8px',
   };
 
   return (
@@ -76,33 +84,34 @@ const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
           </Button>
 
           {/* Login and Dark Mode buttons */}
-          
           <Box>
-          {location.pathname !== '/login' ? (
-            <Button
-              variant="contained"
-              color="primary"
-              size="medium"
-              onClick={'' === userId ? handleLogin : handleLogout}
-              style={{ marginRight: '8px' }}
-            >
-              {'' === userId ? 'Login' : 'Logout'}
-            </Button>
-            ): 
-            <Button
-            variant="contained"
-            color="primary"
-            size="medium"
-            onClick={handleSignup}
-            style={{ marginRight: '8px' }}
-          >
-            {'Sign Up'}
-          </Button>}
+            {location.pathname !== '/login' ? (
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                onClick={'' === userId ? handleLogin : handleLogout}
+                style={buttonStyles}
+              >
+                {'' === userId ? 'Login' : 'Logout'}
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                onClick={handleSignup}
+                style={buttonStyles}
+              >
+                {'Sign Up'}
+              </Button>
+            )}
             <Button
               variant="contained"
               color="primary"
               size="small"
               onClick={handleThemeChange}
+              style={buttonStyles}
             >
               {darkMode ? 'Light Mode' : 'Dark Mode'}
             </Button>
@@ -125,8 +134,7 @@ const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
               bottom: '20px',
               right: '20px',
               zIndex: 9999,
-              backgroundColor: darkMode ? '#f0f0f0' : '#333',
-              color: darkMode ? '#333' : '#f0f0f0',
+              ...buttonStyles,
             }}
           >
             Back to Home

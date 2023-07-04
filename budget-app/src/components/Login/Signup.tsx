@@ -3,7 +3,7 @@ import { makeStyles, Typography, TextField, Button } from '@material-ui/core';
 import { signup } from '../../api'; // Import the signup function from api.ts
 import { Link } from 'react-router-dom';
 import { User } from '../User/User';
-import { handleNavigate } from '../../Utils';
+import { handleRefreshNavigate } from '../../Utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +54,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
       if (response.user_id !== null) {
         console.log('Signup successful');
         onSignup(response.user_id)
-        handleNavigate('/dashboard');
+        handleRefreshNavigate('/dashboard');
       } else {
         console.log('Signup failed');
       }

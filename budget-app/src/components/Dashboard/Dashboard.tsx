@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, Box, Grid, Typography, Card, CardContent } from '@material-ui/core';
+import { makeStyles, Box, Grid, Typography, Card, CardContent, Button, AppBar, Toolbar } from '@material-ui/core';
 import TransactionTable from '../Table/TransactionTable';
 import SavingsGoalTable from '../Table/SavingsGoalTable';
 import { fetchSavingsGoals, fetchTransactions } from '../../api';
+import { handleRefreshNavigate } from '../../Utils';
+import { useNavigate } from 'react-router-dom';
 
 interface DashboardProps {
   currentUserId: string;
@@ -14,9 +16,27 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: 800,
     padding: theme.spacing(2),
   },
+  statsButton: {
+    margin: theme.spacing(1),
+    float: 'right',
+  },
+  card: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+  },
+  appBar: {
+    margin: '20px 0',
+    borderRadius: '8px',
+  },
+  toolbar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  }
 }));
 
 const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
+  const navigate = useNavigate();
+
   const [totalTransactions, setTotalTransactions] = useState<number>(0);
   const [totalSavingsGoals, setTotalSavingsGoals] = useState<number>(0);
   const classes = useStyles();
@@ -45,13 +65,20 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
 
   return (
     <Box className={classes.root}>
-      <Typography align="center" variant="h5">
-        Dashboard
-      </Typography>
+      <AppBar position="static" color="transparent" className={classes.appBar}>
+        <Toolbar className={classes.toolbar}>
+          <Typography variant="h5">
+            Dashboard
+          </Typography>
+          <Button variant="contained" color="primary" className={classes.statsButton} onClick={() => { navigate('/budgeting'); }}>
+            View Stats
+          </Button>
+        </Toolbar>
+      </AppBar>
       <Box mt={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
-            <Card>
+            <Card className={classes.card}>
               <CardContent>
                 <Typography color="textSecondary" gutterBottom>
                   Total Transactions
@@ -63,7 +90,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Card>
+            <Card className={classes.card}>
               <CardContent>
                 <Typography color="textSecondary" gutterBottom>
                   Total Savings Goals
