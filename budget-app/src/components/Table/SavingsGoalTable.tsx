@@ -29,10 +29,11 @@ const savingsGoalFields: Field[] = [
     default: 0,
   },
 ];
-// export type SavingGoal = typeof createDynamicType(savingsGoalFields)
-const savingsGoalKeys = savingsGoalFields.map((field) => field.id);
-const savingsGoalInstance = createDynamicType(savingsGoalFields);
-export type SavingsGoal = typeof savingsGoalInstance;
+
+const savingGoalsInstance = createDynamicType(savingsGoalFields);
+export type SavingsGoal = typeof savingGoalsInstance;
+
+const transactionKeys = savingsGoalFields.map((field) => field.id);
 
 interface SavingsGoalTableProps {
   currentUserId: string;
@@ -47,7 +48,7 @@ const SavingsGoalTable: React.FC<SavingsGoalTableProps> = ({ currentUserId }) =>
       addItem={addSavingsGoal}
       updateItem={updateSavingsGoal}
       removeItem={removeSavingsGoal}
-      headers={savingsGoalKeys}
+      headers={transactionKeys}
       fields={savingsGoalFields}
       defaultItem={defaultItem}
       currentUserId={currentUserId}

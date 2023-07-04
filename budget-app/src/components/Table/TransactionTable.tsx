@@ -6,7 +6,7 @@ import { createDynamicType, Field} from '../../Utils';
 const transactionFields: Field[] = [
   {
     id: 'transaction_id',
-    display_name: 'Transaction ID',
+    display_name: 'ID',
     type: 'string',
     default: '',
   },

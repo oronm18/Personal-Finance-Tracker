@@ -70,7 +70,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
           <Typography variant="h5">
             Dashboard
           </Typography>
-          <Button variant="contained" color="primary" className={classes.statsButton} onClick={() => { navigate('/budgeting'); }}>
+          <Button variant="contained" color="primary" className={classes.statsButton} onClick={() => { handleRefreshNavigate('/budgeting'); }}>
             View Stats
           </Button>
         </Toolbar>
