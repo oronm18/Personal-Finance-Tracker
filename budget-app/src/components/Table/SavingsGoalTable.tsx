@@ -37,9 +37,10 @@ const transactionKeys = savingsGoalFields.map((field) => field.id);
 
 interface SavingsGoalTableProps {
   currentUserId: string;
+  setTotalSavingsGoals: any;
 }
 
-const SavingsGoalTable: React.FC<SavingsGoalTableProps> = ({ currentUserId }) => {
+const SavingsGoalTable: React.FC<SavingsGoalTableProps> = ({ currentUserId, setTotalSavingsGoals }) => {
   const defaultItem = createDynamicType(savingsGoalFields);
 
   return (
@@ -53,6 +54,7 @@ const SavingsGoalTable: React.FC<SavingsGoalTableProps> = ({ currentUserId }) =>
       defaultItem={defaultItem}
       currentUserId={currentUserId}
       idFieldId="saving_goal_id"
+      setTotal={setTotalSavingsGoals}
     />
   );
 };

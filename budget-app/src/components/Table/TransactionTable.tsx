@@ -25,8 +25,9 @@ const transactionFields: Field[] = [
   {
     id: 'category',
     display_name: 'Category',
-    type: 'string',
-    default: '',
+    type: 'select',
+    choices: ["a", "b", "c"],
+    default: 'a',
   },
   {
     id: 'date',
@@ -43,9 +44,10 @@ const transactionKeys = transactionFields.map((field) => field.id);
 
 interface TransactionsProps {
   currentUserId: string;
+  setTotalTransactions: any;
 }
 
-const TransactionsTable: React.FC<TransactionsProps> = ({ currentUserId }) => {
+const TransactionsTable: React.FC<TransactionsProps> = ({ currentUserId, setTotalTransactions }) => {
   const defaultItem = createDynamicType(transactionFields);
 
   return (
@@ -59,6 +61,7 @@ const TransactionsTable: React.FC<TransactionsProps> = ({ currentUserId }) => {
       defaultItem={defaultItem}
       currentUserId={currentUserId}
       idFieldId='transaction_id'
+      setTotal={setTotalTransactions}
     />
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography, FormControl, MenuItem, Select, InputLabel } from '@material-ui/core';
 import { Field } from '../../Utils';
 
 interface UnifiedDialogProps {
@@ -26,6 +26,8 @@ const UnifiedDialog: React.FC<UnifiedDialogProps> = ({
     type }) => {
 
   const [dialogItem, setDialogItem] = useState<any>({});
+  const [customValueField, setCustomValueField] = useState<string | null>(null);
+
   useEffect(() => {
     if (item) {
       setDialogItem(item);
@@ -38,11 +40,23 @@ const UnifiedDialog: React.FC<UnifiedDialogProps> = ({
     prepareFunction(item);
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = fields.find(field => field.id === event.target.name)?.type === 'number' ? Number(event.target.value) : event.target.value;
-    setDialogItem({ ...dialogItem, [event.target.name]: value });
-    };
+  const handleChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+    const target = event.target;
+    if (target.value === "other") {
+      setCustomValueField(target.name || '');
+    } else {
+      setCustomValueField(null);
+      const value = fields.find(field => field.id === target.name)?.type === 'number' ? Number(target.value) : target.value;
+      setDialogItem({ ...dialogItem, [target.name || '']: value });
+    }
+  };
 
+  const handleCustomChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+    const target = event.target;
+    const value = fields.find(field => field.id === target.name)?.type === 'number' ? Number(target.value) : target.value;
+    setDialogItem({ ...dialogItem, [target.name || '']: value });
+  };
+  
   const submitForm = async () => {
     if (handleSubmit !== undefined) {
         await handleSubmit(userId, dialogItem);
@@ -57,18 +71,45 @@ const UnifiedDialog: React.FC<UnifiedDialogProps> = ({
       case 'add':
       case 'edit':
         return (
-          filteredFields.map((field) => (
-            <TextField
-            key={field.id}
-            name={field.id}
-            label={"Date" !== field.display_name ? field.display_name : " "}
-            value={dialogItem[field.id] || ''}
-            type={field.type}
-            onChange={handleChange}
-            fullWidth
+          filteredFields.map((field) => {
+            return(field.type === 'select' ? (
+<div key={field.id}>
+                  <FormControl fullWidth>
+                    <InputLabel>{field.display_name}</InputLabel>
+                    <Select
+                      value={customValueField === field.id ? 'other' : dialogItem[field.id] || ''}
+                      onChange={handleChange}
+                      name={field.id}
+                    >
+                      {field.choices?.map((choice) => (
+                        <MenuItem key={choice} value={choice}>{choice}</MenuItem>
+                      ))}
+                      <MenuItem value="other">Other...</MenuItem>
+                    </Select>
+                  </FormControl>
+                  {customValueField === field.id && (
+                    <TextField
+                      name={field.id}
+                      value={dialogItem[field.id] || ''}
+                      onChange={handleCustomChange}
+                      fullWidth
+                    />
+                  )}
+                </div>
+                ) : 
+                (
+                <TextField
+                  key={field.id}
+                  name={field.id}
+                  label={"Date" !== field.display_name ? field.display_name : " "}
+                  value={dialogItem[field.id] || ''}
+                  type={field.type}
+                  onChange={handleChange}
+                  fullWidth
+                />
+                )
             
-            />
-          ))
+          )})
         );
       case 'view':
         return (

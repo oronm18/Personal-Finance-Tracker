@@ -77,7 +77,7 @@ const Budgeting: React.FC<BudgetingProps> = ({ userId }) => {
     // Fetch user data on mount and userId change
     useEffect(() => {
         if (!userId) {
-            handleRefreshNavigate('/login');
+          navigate('/login');
         }
 
         const fetchData = async () => {
@@ -93,7 +93,7 @@ const Budgeting: React.FC<BudgetingProps> = ({ userId }) => {
 
     // Navigation Handlers
     const handleReturnToDashboard = () => {
-        handleRefreshNavigate('/dashboard');
+      navigate('/dashboard');
     };
 
     const handlePrev = () => {

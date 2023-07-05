@@ -2,6 +2,8 @@ export interface Field {
     id: string;
     display_name: string;
     type: string;
+    choices?: string[];
+    allowCustom?: boolean;
     default: any;
   }
 

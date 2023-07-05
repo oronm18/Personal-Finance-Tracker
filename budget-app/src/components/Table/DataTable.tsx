@@ -28,9 +28,10 @@ interface DataTableProps {
   defaultItem: any;
   currentUserId: string;
   idFieldId: string;
+  setTotal: any;
 }
 
-const DataTable: React.FC<DataTableProps> = ({ fetchItems, addItem, updateItem, removeItem, headers, fields, defaultItem, currentUserId, idFieldId }) => {
+const DataTable: React.FC<DataTableProps> = ({ fetchItems, addItem, updateItem, removeItem, headers, fields, defaultItem, currentUserId, idFieldId, setTotal }) => {
   const classes = useStyles();
   const [items, setItems] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
@@ -68,6 +69,7 @@ useEffect(() => {
   const getItems = async () => {
     const fetchedItems = await fetchItems(currentUserId);
     setItems(fetchedItems);
+    setTotal(fetchedItems.length);
   };
 
   const handleAddItem = async (userId: string, item: any) => {
@@ -112,33 +114,33 @@ const handleUpdateItemDetails = (item: any) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((item) => (
-              <TableRow key={item[headers[0]]}>
+          {items.map((item) => (
+            <TableRow key={item[headers[0]]} onClick={() => handleViewItemDetails(item)}>
                 {fields.map((field) => {
-                  if (field.id === idFieldId) {
-                    return null; // Skip rendering the ID field in the table row
-                  }
-                  return <TableCell key={field.id}>{item[field.id]}</TableCell>;
+                    if (field.id === idFieldId) {
+                        return null; // Skip rendering the ID field in the table row
+                    }
+                    return <TableCell key={field.id}>{item[field.id]}</TableCell>;
                 })}
                 <TableCell align="right">
-                  <Tooltip title="Delete">
-                    <IconButton aria-label="delete" onClick={() => handleRemoveItem(currentUserId, item)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="View">
-                    <IconButton aria-label="view" onClick={() => handleViewItemDetails(item)}>
-                      <ViewIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="edit">
-                    <IconButton aria-label="edit" onClick={() => {handleUpdateItemDetails(item)}}>
-                      <Edit />
-                    </IconButton>
-                  </Tooltip>
+                    <Tooltip title="Delete">
+                        <IconButton aria-label="delete" onClick={(e) => {e.stopPropagation(); handleRemoveItem(currentUserId, item)}}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="View">
+                        <IconButton aria-label="view" onClick={(e) => {e.stopPropagation(); handleViewItemDetails(item)}}>
+                            <ViewIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="edit">
+                        <IconButton aria-label="edit" onClick={(e) => {e.stopPropagation(); handleUpdateItemDetails(item)}}>
+                            <Edit />
+                        </IconButton>
+                    </Tooltip>
                 </TableCell>
-              </TableRow>
-            ))}
+            </TableRow>
+        ))}
           </TableBody>
         </Table>
       </TableContainer>
