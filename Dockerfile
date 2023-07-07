@@ -7,7 +7,6 @@ WORKDIR /app/budget_server
 
 # Install server dependencies
 COPY ./budget_server/src/requirements.txt ./
-RUN apt-get update && apt-get install -y python3-pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./budget_server/src/ /app/budget_server/src
