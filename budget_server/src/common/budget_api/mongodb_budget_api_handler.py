@@ -96,6 +96,7 @@ class MongoDBBudgetApiHandler(AbstractBudgetApiHandler):
             {"$set": {f"{USERS_DATA_FIELD}.{USERS_DATA_SAVINGS_GOALS_FIELD}.$": savings_goal.dict()}}
         )
         return result.modified_count > 0
+
     def add_new_user(self, username: str, hashed_password: str) -> str:
         """Add a new user to the database. return his id."""
         user_data = {

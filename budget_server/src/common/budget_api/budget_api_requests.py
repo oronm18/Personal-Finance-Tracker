@@ -11,13 +11,17 @@ from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
 import uvicorn
-
-# ----- Application ----- #
 from common.budget_api.abstract_budget_api_handler import Transaction, USERS_USERNAME_FIELD, \
     USERS_HASHED_PASSWORD_FIELD, SavingGoal
 from common.budget_api.json_budget_api_handler import JsonBudgetApiHandler
 from common.budget_api.mongodb_budget_api_handler import MongoDBBudgetApiHandler
 from common.utils import generate_unique_id, compare_hashes, hash_password
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
+from starlette.routing import Route
+
+
+# ----- Application ----- #
 
 
 class User(BaseModel):
@@ -40,6 +44,8 @@ app.add_middleware(
 # Initialize the handler
 # handler = JsonBudgetApiHandler('C://temp/budget_data.json')
 handler = MongoDBBudgetApiHandler()
+
+WEB_APP_BUILD_DIRECTORY = "../../budget_web/build"
 
 @app.get("/transactions", response_model=list[Transaction])
 async def get_transactions(user_id: str):
@@ -114,9 +120,10 @@ async def login(payload: User):
 
 
 def run_server():
+    app.mount("/static", StaticFiles(directory=f"{WEB_APP_BUILD_DIRECTORY }/static"), name="static")
+    app.mount("/", FileResponse(f"{WEB_APP_BUILD_DIRECTORY}/index.html", media_type="text/html"), name="index")
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
-# ----- Main ----- #
 
 if __name__ == "__main__":
     run_server()
