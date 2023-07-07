@@ -1,6 +1,6 @@
 # Base images
-FROM python:3.9-slim AS server_base
-FROM node:14 AS web_base
+FROM python:3.9-slim AS build_python
+FROM node:14 AS build_node
 
 # ---- Python server ----
 WORKDIR /app/budget_server
@@ -21,10 +21,11 @@ COPY ./budget_web/ ./
 RUN npm run build
 
 # ---- Final image ----
-FROM server_base
+FROM python:3.9-slim
 
-# Copy built web application from web_base
-COPY --from=web_base /app/budget_web/build /app/budget_web/build
+WORKDIR /app
+COPY --from=build_python /app/budget_server /app/budget_server
+COPY --from=build_node /app/budget_web/build /app/budget_web/build
 
 # Start the server
 CMD ["python", "/app/budget_server/src/main.py"]
