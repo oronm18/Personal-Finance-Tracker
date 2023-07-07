@@ -4,7 +4,7 @@ import { SavingsGoal } from './components/Table/SavingsGoalTable';
 import { User } from './components/User/User';
 
 const api = axios.create({
-  baseURL: 'http://10.0.0.20:8000',
+  baseURL: 'http://192.168.10.115',
 });
 
 export const fetchTransactions = async (user_id: string) => {
@@ -39,12 +39,12 @@ export const removeSavingsGoal = async (user_id: string, saving_goal: SavingsGoa
 };
 
 export const login = async (user: User) => {
-  const response = await api.post(`/login`, user);
+  const response = await api.post(`/user_login`, user);
   return response.data;
 };
 
 export const signup = async (user: User) => {
-  const response = await api.post(`/signup`, user);
+  const response = await api.post(`/user_signup`, user);
   return response.data;
 };
 

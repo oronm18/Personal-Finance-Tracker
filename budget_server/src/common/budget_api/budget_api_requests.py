@@ -45,7 +45,6 @@ app.add_middleware(
 # handler = JsonBudgetApiHandler('C://temp/budget_data.json')
 handler = MongoDBBudgetApiHandler()
 
-WEB_APP_BUILD_DIRECTORY = "../../budget_web/build"
 
 @app.get("/transactions", response_model=list[Transaction])
 async def get_transactions(user_id: str):
@@ -95,10 +94,11 @@ async def update_savings_goal(user_id: str, savings_goal: SavingGoal):
     return {"status": "Savings goal updated"}
 
 
-@app.post("/login")
+@app.post("/user_login")
 async def login(payload: User):
     username = payload.username
     password = payload.password
+    print(username, password)
     for user_id, user_props in handler.get_users().items():
         if user_props[USERS_USERNAME_FIELD] == username:
             if compare_hashes(password, user_props[USERS_HASHED_PASSWORD_FIELD]):
@@ -108,7 +108,7 @@ async def login(payload: User):
     raise HTTPException(status_code=401, detail="Username does not exist!")
 
 
-@app.post("/signup")
+@app.post("/user_signup")
 async def login(payload: User):
     username = payload.username
     password = payload.password
@@ -119,11 +119,11 @@ async def login(payload: User):
     return {"user_id": user_id}
 
 
-def run_server():
-    app.mount("/static", StaticFiles(directory=f"{WEB_APP_BUILD_DIRECTORY }/static"), name="static")
-    app.mount("/", FileResponse(f"{WEB_APP_BUILD_DIRECTORY}/index.html", media_type="text/html"), name="index")
+def run_server(build_directory):
+    app.mount("/static", StaticFiles(directory=f"{build_directory}/static"), name="static")
+    app.mount("/", FileResponse(f"{build_directory}/index.html", media_type="text/html"), name="index")
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
 if __name__ == "__main__":
-    run_server()
+    run_server("../../budget_web/build")

@@ -1,31 +1,30 @@
-# Base images
-FROM python:3.9-slim AS build_python
-FROM node:14 AS build_node
+# Start a new stage for the web part
+FROM node:14 as web-build
 
-# ---- Python server ----
-WORKDIR /app/budget_server
+WORKDIR /web
 
-# Install server dependencies
-COPY ./budget_server/src/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./budget_web /web
 
-COPY ./budget_server/src/ /app/budget_server/src
-
-# ---- Web application ----
-WORKDIR /app/budget_web
-
-# Install and build the web application
-COPY ./budget_web/package*.json ./
+# Install dependencies
 RUN npm install
-COPY ./budget_web/ ./
+
+# Build the web application
 RUN npm run build
 
-# ---- Final image ----
-FROM python:3.9-slim
+# Start from a base image for server
+FROM python:3.9-slim-buster as server-build
 
+# Set working directory in the container
 WORKDIR /app
-COPY --from=build_python /app/budget_server /app/budget_server
-COPY --from=build_node /app/budget_web/build /app/budget_web/build
 
-# Start the server
-CMD ["python", "/app/budget_server/src/main.py"]
+# Copy the directory 'budget_server' into the container at /app
+COPY ./budget_server /app
+
+# Copy the built web app from the previous stage
+COPY --from=web-build /web/build /app/budget_web/build
+
+# Install dependencies
+RUN pip install --no-cache-dir -r src/requirements.txt
+
+# Set command to run your application using CMD command
+ENTRYPOINT ["python", "./src/main.py", "/app/budget_web/build"]
