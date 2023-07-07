@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles, Typography, TextField, Button } from '@material-ui/core';
 import { login } from '../../api'; // Import the login function from api.ts
 import { Link } from 'react-router-dom';
@@ -45,6 +45,18 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleError = async () => {
+    alert(error);
+    setError('');
+  }
+
+  useEffect(() => {
+    if (error) {
+      handleError();
+    }
+  }, [error]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +68,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         console.log('Login successful');
         handleRefreshNavigate('/dashboard')
       } else {
-        console.log('Invalid username or password');
+        setError('Error while login.');
       }
-    } catch (error) {
-      console.log('An error occurred during login');
+    } catch (serveError: any) {
+      setError(serveError.message);
     }
     // Reset form fields
     setUsername('');

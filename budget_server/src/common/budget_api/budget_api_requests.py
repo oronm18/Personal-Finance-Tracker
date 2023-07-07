@@ -5,6 +5,7 @@ Author: Oron Moshe
 date: 23/06/2023
 """
 # ----- Imports ----- #
+import re
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -109,12 +110,18 @@ async def login(payload: User):
 
 
 @app.post("/user_signup")
-async def login(payload: User):
+async def signup(payload: User):
     username = payload.username
     password = payload.password
+
     for user_id, user_props in handler.get_users().items():
         if user_props[USERS_USERNAME_FIELD] == username:
             raise HTTPException(status_code=409, detail="Username already taken.")
+
+    password_pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+    if not re.match(password_pattern, password):
+        raise HTTPException(status_code=400, detail="Password does not meet the security requirements.")
+
     user_id = handler.add_new_user(username=username, hashed_password=hash_password(password))
     return {"user_id": user_id}
 
