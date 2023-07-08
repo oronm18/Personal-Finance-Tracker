@@ -70,6 +70,7 @@ interface BudgetingProps {
 const Budgeting: React.FC<BudgetingProps> = ({ userId }) => {
     const navigate = useNavigate();
     const classes = useStyles();
+    const [incomesData, setIncomesData] = useState([]);
     const [transactionData, setTransactionData] = useState([]);
     const [savingsData, setSavingsData] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -85,6 +86,9 @@ const Budgeting: React.FC<BudgetingProps> = ({ userId }) => {
 
             const savingGoals = await fetchItems(userId, "savings-goals");
             setSavingsData(savingGoals);
+
+            const incomes = await fetchItems(userId, "income");
+            setIncomesData(incomesData);
         };
 
         fetchData();
@@ -116,30 +120,57 @@ const Budgeting: React.FC<BudgetingProps> = ({ userId }) => {
             </Button>
           </Box>
   
-          <Box mb={5}>
-            <Typography align="center" variant="h4">
-              Transactions
-            </Typography>
-            <ResponsiveContainer width="100%" height={400}>
-              <PieChart>
-                <Pie
-                  dataKey="amount"
-                  isAnimationActive={false}
-                  data={transactionData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  label
-                >
-                  {transactionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+          <Box>
+            <Box mb={5}>
+              <Typography align="center" variant="h4">
+                Income
+              </Typography>
+              <ResponsiveContainer width="100%" height={400}>
+                <PieChart>
+                  <Pie
+                    dataKey="amount"
+                    isAnimationActive={false}
+                    data={incomesData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    label
+                  >
+                    {transactionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </Box>
+            <Box mb={5}>
+              <Typography align="center" variant="h4">
+                Transactions
+              </Typography>
+              <ResponsiveContainer width="100%" height={400}>
+                <PieChart>
+                  <Pie
+                    dataKey="amount"
+                    isAnimationActive={false}
+                    data={transactionData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    label
+                  >
+                    {transactionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </Box>
           </Box>
   
           <Box mb={5}>

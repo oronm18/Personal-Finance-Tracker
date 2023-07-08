@@ -49,6 +49,16 @@ class BudgetBaseModel(BaseModel):
     item_id: str
 
 
+class Income(BudgetBaseModel):
+    """
+    Transaction Class.
+    """
+    name: str
+    amount: float
+    category: str
+    date: str
+
+
 class Transaction(BudgetBaseModel):
     """
     Transaction Class.
@@ -69,8 +79,9 @@ class SavingGoal(BudgetBaseModel):
 
 
 ITEM_CLASSES = {
+    "income": Income,
     "transactions": Transaction,
-    "savings-goals": SavingGoal
+    "savings-goals": SavingGoal,
 }
 
 

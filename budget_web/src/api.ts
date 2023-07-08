@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { Transaction } from './components/Table/TransactionTable';
-import { SavingsGoal } from './components/Table/SavingsGoalTable';
 import { User } from './components/User/User';
 
 const api = axios.create({
