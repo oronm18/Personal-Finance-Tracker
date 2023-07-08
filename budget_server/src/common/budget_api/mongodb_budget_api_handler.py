@@ -8,6 +8,7 @@ date: 23/06/2023
 # ----- Import ----- #
 
 import os
+from typing import Type
 
 from pymongo import MongoClient
 from bson import ObjectId
@@ -15,7 +16,8 @@ from bson import ObjectId
 # ----- MongoDB Configuration ----- #
 from common.budget_api.abstract_budget_api_handler import USERS_DATA_FIELD, USERS_DATA_TRANSACTIONS_FIELD, \
     USERS_DATA_SAVINGS_GOALS_FIELD, USERS_DATA_SAVINGS_GOALS_ID_FIELD, USERS_DATA_TRANSACTIONS_FIELD_ID, \
-    USERS_HASHED_PASSWORD_FIELD, USERS_USERNAME_FIELD, SavingGoal, AbstractBudgetApiHandler, Transaction
+    USERS_HASHED_PASSWORD_FIELD, USERS_USERNAME_FIELD, SavingGoal, AbstractBudgetApiHandler, Transaction, \
+    BudgetBaseModel
 
 MONGO_URI = "mongodb+srv://oronm18:VHzjGdg7FtiukAtJ@budgetapi.m5jq1ht.mongodb.net/?retryWrites=true&w=majority"
 MONGO_DATABASE_NAME = "budgetapi"
@@ -42,58 +44,36 @@ class MongoDBBudgetApiHandler(AbstractBudgetApiHandler):
         # Assuming that the structure is {user_id: user_data}
         return self.get_users()
 
-    def fetch_transactions(self, user_id: str) -> list[Transaction]:
-        """Fetch transactions from the database for a given user."""
+    def fetch_items(self, user_id: str, item_class: Type[BudgetBaseModel]) -> list[BudgetBaseModel]:
+        """Fetch items from the database for a given user."""
         user = collection.find_one({"_id": ObjectId(user_id)})
-        transactions = user[USERS_DATA_FIELD][USERS_DATA_TRANSACTIONS_FIELD]
-        return [Transaction(**transaction) for transaction in transactions]
+        item_field = item_class.__name__.lower()
+        items = user[USERS_DATA_FIELD][item_field]
+        return [item_class(**item) for item in items]
 
-    def fetch_savings_goals(self, user_id: str) -> list[SavingGoal]:
-        """Fetch savings goals from the database for a given user."""
-        user = collection.find_one({"_id": ObjectId(user_id)})
-        savings_goals = user[USERS_DATA_FIELD][USERS_DATA_SAVINGS_GOALS_FIELD]
-        return [SavingGoal(**saving_goal) for saving_goal in savings_goals]
-
-    def add_transactions(self, user_id: str, transactions: list[Transaction]) -> bool:
+    def add_items(self, user_id: str, items: list[BudgetBaseModel]) -> bool:
         """Add transactions to the database for a given user."""
-        new_transactions = [transaction.dict() for transaction in transactions]
-        result = collection.update_one({"_id": ObjectId(user_id)}, {
-            "$push": {f"{USERS_DATA_FIELD}.{USERS_DATA_TRANSACTIONS_FIELD}": {"$each": new_transactions}}})
-        return result.modified_count > 0
+        does_fail = False
+        for item in items:
+            item_dict = item.dict()
+            result = collection.update_one({"_id": ObjectId(user_id)}, {
+                "$push": {f"{USERS_DATA_FIELD}.{item.__class__.__name__.lower()}": {"$each": [item_dict]}}})
+            does_fail |= result.modified_count <= 0
+        return not does_fail
 
-    def add_savings_goals(self, user_id: str, savings_goals: list[SavingGoal]) -> bool:
-        """Add savings goals to the database for a given user."""
-        new_savings_goals = [saving_goal.dict() for saving_goal in savings_goals]
-        result = collection.update_one({"_id": ObjectId(user_id)}, {
-            "$push": {f"{USERS_DATA_FIELD}.{USERS_DATA_SAVINGS_GOALS_FIELD}": {"$each": new_savings_goals}}})
-        return result.modified_count > 0
-
-    def remove_transaction(self, user_id: str, transaction_id: str) -> bool:
-        """Remove a specific transaction for a given user."""
+    def remove_item(self, user_id: str, item_id: str, item_class: Type[BudgetBaseModel]) -> bool:
+        """Remove a specific item for a given user."""
+        item_field = item_class.__name__.lower()
         result = collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {
-            f"{USERS_DATA_FIELD}.{USERS_DATA_TRANSACTIONS_FIELD}": {USERS_DATA_TRANSACTIONS_FIELD_ID: transaction_id}}})
+            f"{USERS_DATA_FIELD}.{item_field}": {"item_id": item_id}}})
         return result.modified_count > 0
 
-    def remove_saving_goal(self, user_id: str, saving_goal_id: str) -> bool:
-        """Remove a specific savings goal for a given user."""
-        result = collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {
-            f"{USERS_DATA_FIELD}.{USERS_DATA_SAVINGS_GOALS_FIELD}": {
-                USERS_DATA_SAVINGS_GOALS_ID_FIELD: saving_goal_id}}})
-        return result.modified_count > 0
-
-    def update_transaction(self, user_id: str, transaction: Transaction) -> bool:
-        """Update a specific transaction for a given user."""
+    def update_item(self, user_id: str, item: BudgetBaseModel) -> bool:
+        """Update a specific item for a given user."""
+        item_field = item.__class__.__name__.lower()
         result = collection.update_one(
-            {"_id": ObjectId(user_id), f"{USERS_DATA_FIELD}.{USERS_DATA_TRANSACTIONS_FIELD}.{USERS_DATA_TRANSACTIONS_FIELD_ID}": transaction.transaction_id},
-            {"$set": {f"{USERS_DATA_FIELD}.{USERS_DATA_TRANSACTIONS_FIELD}.$": transaction.dict()}}
-        )
-        return result.modified_count > 0
-
-    def update_savings_goal(self, user_id: str, savings_goal: SavingGoal) -> bool:
-        """Update a specific savings goal for a given user."""
-        result = collection.update_one(
-            {"_id": ObjectId(user_id), f"{USERS_DATA_FIELD}.{USERS_DATA_SAVINGS_GOALS_FIELD}.{USERS_DATA_SAVINGS_GOALS_ID_FIELD}": savings_goal.saving_goal_id},
-            {"$set": {f"{USERS_DATA_FIELD}.{USERS_DATA_SAVINGS_GOALS_FIELD}.$": savings_goal.dict()}}
+            {"_id": ObjectId(user_id), f"{USERS_DATA_FIELD}.{item_field}.item_id": item.item_id},
+            {"$set": {f"{USERS_DATA_FIELD}.{item_field}.$": item.dict()}}
         )
         return result.modified_count > 0
 

@@ -39,6 +39,10 @@ const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
     navigate('/');
   };
 
+  const navigateToDashboard = () => {
+    navigate('/dashboard');
+  };
+
   const handleLogout = () => {
     sessionStorage.removeItem('userId');
     setUserId('');
@@ -122,13 +126,13 @@ const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
         <Box style={{ marginTop: '80px', paddingTop: '5px' }}>{children}</Box>
 
         {/* Back to home button */}
-        {location.pathname !== '/' && (
+        {location.pathname !== '/' && location.pathname !== '/dashboard' && (
           <Button
             variant="contained"
             color="primary"
             size="large"
             className="Back-button"
-            onClick={navigateToHome}
+            onClick={userId ? navigateToDashboard : navigateToHome}
             style={{
               position: 'fixed',
               bottom: '20px',
@@ -137,7 +141,7 @@ const Layout: React.FC<LayoutProps> = ({ children, userId, setUserId }) => {
               ...buttonStyles,
             }}
           >
-            Back to Home
+            {userId ? "Go to Dashboard": "Back to Home"}
           </Button>
         )}
       </Box>

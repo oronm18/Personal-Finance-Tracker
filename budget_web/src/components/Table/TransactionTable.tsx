@@ -1,11 +1,10 @@
 import React from 'react';
-import { fetchTransactions, addTransaction, removeTransaction, updateTransaction } from '../../api';
 import DataTable from './DataTable';
 import { createDynamicType, Field} from '../../Utils';
 
 const transactionFields: Field[] = [
   {
-    id: 'transaction_id',
+    id: 'item_id',
     display_name: 'ID',
     type: 'string',
     default: '',
@@ -52,15 +51,12 @@ const TransactionsTable: React.FC<TransactionsProps> = ({ currentUserId, setTota
 
   return (
     <DataTable
-      fetchItems={fetchTransactions}
-      addItem={addTransaction}
-      updateItem={updateTransaction}
-      removeItem={removeTransaction}
+      itemType={"transactions"}
       headers={transactionKeys}
       fields={transactionFields}
       defaultItem={defaultItem}
       currentUserId={currentUserId}
-      idFieldId='transaction_id'
+      idFieldId='item_id'
       setTotal={setTotalTransactions}
     />
   );

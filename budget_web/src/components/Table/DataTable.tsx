@@ -6,6 +6,7 @@ import ViewIcon from '@material-ui/icons/Visibility';
 import { Field } from '../../Utils';
 import UnifiedDialog from '../Dialog/UnifiedDialog';
 import { Edit } from '@material-ui/icons';
+import { fetchItems, addItem, removeItem, updateItem } from '../../api';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -19,10 +20,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface DataTableProps {
-  fetchItems: (userId: string) => Promise<any[]>;
-  addItem: (userId: string, item: any) => Promise<void>;
-  removeItem: (userId: string, item: any) => Promise<void>;
-  updateItem: (userId: string, item: any) => Promise<void>;
+  itemType: string;
   headers: string[];
   fields: Field[];
   defaultItem: any;
@@ -31,7 +29,7 @@ interface DataTableProps {
   setTotal: any;
 }
 
-const DataTable: React.FC<DataTableProps> = ({ fetchItems, addItem, updateItem, removeItem, headers, fields, defaultItem, currentUserId, idFieldId, setTotal }) => {
+const DataTable: React.FC<DataTableProps> = ({ itemType, headers, fields, defaultItem, currentUserId, idFieldId, setTotal }) => {
   const classes = useStyles();
   const [items, setItems] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
@@ -67,24 +65,24 @@ useEffect(() => {
   }, []);
 
   const getItems = async () => {
-    const fetchedItems = await fetchItems(currentUserId);
+    const fetchedItems = await fetchItems(currentUserId, itemType);
     setItems(fetchedItems);
     setTotal(fetchedItems.length);
   };
 
   const handleAddItem = async (userId: string, item: any) => {
     console.log(item)
-    await addItem(userId, item);
+    await addItem(userId, item, itemType);
     getItems();
   };
 
   const handleRemoveItem = async (userId: string, item: any) => {
-    await removeItem(userId, item);
+    await removeItem(userId, item, itemType);
     getItems();
   };
 
   const handleUpdateItem = async (userId: string, item: any) => {
-    await updateItem(userId, item);
+    await updateItem(userId, item, itemType);
     getItems();
   };
 

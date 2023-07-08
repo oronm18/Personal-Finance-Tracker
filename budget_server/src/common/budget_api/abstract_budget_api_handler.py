@@ -9,6 +9,8 @@ date: 23/06/2023
 import logging
 from abc import ABC, abstractmethod
 import json
+from typing import Type
+
 from pydantic import BaseModel
 import os
 
@@ -39,25 +41,37 @@ USERS_DATA_SAVINGS_GOALS_TARGET_FIELD = "target"
 
 # ----- Classes ----- #
 
-class Transaction(BaseModel):
+
+class BudgetBaseModel(BaseModel):
+    """
+    Base budget model Class.
+    """
+    item_id: str
+
+
+class Transaction(BudgetBaseModel):
     """
     Transaction Class.
     """
-    transaction_id: str
     name: str
     amount: float
     category: str
     date: str
 
 
-class SavingGoal(BaseModel):
+class SavingGoal(BudgetBaseModel):
     """
     SavingGoal Class.
     """
-    saving_goal_id: str
     name: str
     current: float
     target: float
+
+
+ITEM_CLASSES = {
+    "transactions": Transaction,
+    "savings-goals": SavingGoal
+}
 
 
 class AbstractBudgetApiHandler(ABC):
@@ -73,44 +87,23 @@ class AbstractBudgetApiHandler(ABC):
         """Get all data."""
         pass
 
-    @abstractmethod
-    def fetch_transactions(self, user_id: str) -> list[Transaction]:
-        """Fetch transactions from the database for a given user."""
+    def fetch_items(self, user_id: str, item_class: Type[BudgetBaseModel]) -> list[BudgetBaseModel]:
+        """Fetch items from the database for a given user."""
         pass
 
     @abstractmethod
-    def fetch_savings_goals(self, user_id: str) -> list[SavingGoal]:
-        """Fetch savings goals from the database for a given user."""
+    def add_items(self, user_id: str, items: list[BudgetBaseModel]) -> bool:
+        """Add items to the database for a given user."""
         pass
 
     @abstractmethod
-    def add_transactions(self, user_id: str, transactions: list[Transaction]) -> bool:
-        """Add transactions to the database for a given user."""
+    def remove_item(self, user_id: str, item_id: str, item_class: Type[BudgetBaseModel]) -> bool:
+        """Remove a specific item for a given user."""
         pass
 
     @abstractmethod
-    def add_savings_goals(self, user_id: str, savings_goals: list[SavingGoal]) -> bool:
-        """Add savings goals to the database for a given user."""
-        pass
-
-    @abstractmethod
-    def remove_transaction(self, user_id: str, transaction_id: str) -> bool:
-        """Remove a specific transaction for a given user."""
-        pass
-
-    @abstractmethod
-    def remove_saving_goal(self, user_id: str, saving_goal_id: str) -> bool:
-        """Remove a specific savings goal for a given user."""
-        pass
-
-    @abstractmethod
-    def update_transaction(self, user_id: str, transaction: Transaction) -> bool:
-        """Update a transaction for a given user."""
-        pass
-
-    @abstractmethod
-    def update_savings_goal(self, user_id: str, savings_goal: SavingGoal) -> bool:
-        """Update a savings goal for a given user."""
+    def update_item(self, user_id: str, item: BudgetBaseModel) -> bool:
+        """Update a specific item for a given user."""
         pass
 
     @abstractmethod

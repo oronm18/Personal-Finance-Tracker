@@ -30,8 +30,8 @@ import {
 } from 'recharts';
 
 // API and Utilities Imports
-import { fetchSavingsGoals, fetchTransactions } from '../../api';
 import { handleRefreshNavigate } from '../../Utils';
+import { fetchItems } from '../../api';
 
 // Styling Constants
 const useStyles = makeStyles((theme) => ({
@@ -74,17 +74,16 @@ const Budgeting: React.FC<BudgetingProps> = ({ userId }) => {
     const [savingsData, setSavingsData] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // Fetch user data on mount and userId change
     useEffect(() => {
         if (!userId) {
           navigate('/login');
         }
 
         const fetchData = async () => {
-            const transactions = await fetchTransactions(userId);
+            const transactions = await fetchItems(userId, "transactions");
             setTransactionData(transactions);
 
-            const savingGoals = await fetchSavingsGoals(userId);
+            const savingGoals = await fetchItems(userId, "savings-goals");
             setSavingsData(savingGoals);
         };
 

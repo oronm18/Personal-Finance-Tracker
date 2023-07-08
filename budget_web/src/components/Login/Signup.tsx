@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles, Typography, TextField, Button } from '@material-ui/core';
 import { signup } from '../../api'; // Import the signup function from api.ts
 import { Link } from 'react-router-dom';
@@ -35,7 +35,12 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
     textDecoration: 'none',
   },
+  passwordRequirements: {
+    color: theme.palette.text.secondary,
+    marginBottom: theme.spacing(2),
+  },
 }));
+
 
 interface SignupProps {
     onSignup: (userId: string) => void;
@@ -45,6 +50,19 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleError = async () => {
+    alert(error);
+    setError('');
+  }
+
+  useEffect(() => {
+    if (error) {
+      handleError();
+    }
+  }, [error]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +74,10 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
         onSignup(response.user_id)
         handleRefreshNavigate('/dashboard');
       } else {
-        console.log('Signup failed');
+        setError('Error while signup.');
       }
-    } catch (error) {
-      console.log('An error occurred during signup');
+    } catch (serveError: any) {
+      setError(serveError.message);
     }
     // Reset form fields
     setUsername('');
@@ -85,6 +103,15 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <Typography variant="body2" className={classes.passwordRequirements}>
+          <strong>Password must meet the following requirements:</strong>
+          <ul>
+            <li>At least 8 characters long</li>
+            <li>Contain both uppercase and lowercase letters</li>
+            <li>Include at least one digit</li>
+            <li>Include at least one special character such as @$!%*?&</li>
+          </ul>
+        </Typography>
         <Button
           className={classes.button}
           variant="contained"

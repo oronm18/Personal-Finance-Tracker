@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles, Box, Grid, Typography, Card, CardContent, Button } from '@material-ui/core';
 import TransactionTable from '../Table/TransactionTable';
 import SavingsGoalTable from '../Table/SavingsGoalTable';
-import { fetchSavingsGoals, fetchTransactions } from '../../api';
+import { fetchItems } from '../../api';
 import { handleRefreshNavigate } from '../../Utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,6 +26,12 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
   const classes = useStyles();
 
   useEffect(() => {
+    if (!currentUserId) {
+      navigate('/login');
+    }}
+    )
+
+  useEffect(() => {
     const fetchData = async () => {
       const transactions = await getTransactions();
       const savingsGoals = await getSavingGoals();
@@ -37,12 +43,12 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
   }, []);
 
   const getTransactions = async () => {
-    const transactions = await fetchTransactions(currentUserId);
+    const transactions = await fetchItems(currentUserId, "transactions");
     return transactions.length;
   };
 
   const getSavingGoals = async () => {
-    const savingsGoals = await fetchSavingsGoals(currentUserId);
+    const savingsGoals = await fetchItems(currentUserId, "savings-goals");
     return savingsGoals.length;
   };
 
@@ -53,7 +59,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
         <Typography align="center" variant="h5">
           Dashboard
         </Typography>
-        <Button color="primary" onClick={() => { handleRefreshNavigate('/budgeting'); }}>
+        <Button color="primary" onClick={() => { navigate('/budgeting'); }}>
           View Stats
         </Button>
       </Box>

@@ -1,11 +1,10 @@
 import React from 'react';
-import { fetchSavingsGoals, addSavingsGoal, removeSavingsGoal, updateSavingsGoal } from '../../api';
 import DataTable from './DataTable';
 import { createDynamicType, Field} from '../../Utils';
 
 const savingsGoalFields: Field[] = [
   {
-    id: 'saving_goal_id',
+    id: 'item_id',
     display_name: 'ID',
     type: 'string',
     default: '',
@@ -45,15 +44,12 @@ const SavingsGoalTable: React.FC<SavingsGoalTableProps> = ({ currentUserId, setT
 
   return (
     <DataTable
-      fetchItems={fetchSavingsGoals}
-      addItem={addSavingsGoal}
-      updateItem={updateSavingsGoal}
-      removeItem={removeSavingsGoal}
+      itemType={"savings-goals"}
       headers={transactionKeys}
       fields={savingsGoalFields}
       defaultItem={defaultItem}
       currentUserId={currentUserId}
-      idFieldId="saving_goal_id"
+      idFieldId="item_id"
       setTotal={setTotalSavingsGoals}
     />
   );
