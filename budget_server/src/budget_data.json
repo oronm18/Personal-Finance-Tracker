@@ -1,0 +1,20 @@
+{
+    "users": {
+        "b9f27dd4-c24b-482b-b1a6-76170eaf29c3": {
+            "username": "FFF",
+            "hashed_password": "$2b$12$C3E62yqgkf93XoG2hklCNOToe4umkEkunijjHze75kTM.JXHBsyG.",
+            "data": {
+                "transactions": [
+                    {
+                        "item_id": "8284fc28-2868-445a-9870-457bc5793efe",
+                        "name": "12312",
+                        "amount": 3123123.0,
+                        "category": "b",
+                        "date": "1111-11-11"
+                    }
+                ],
+                "savings_goals": []
+            }
+        }
+    }
+}

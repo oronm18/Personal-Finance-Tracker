@@ -1,6 +1,6 @@
 // Importing necessary modules
 import React, { useState, useEffect } from 'react';
-import { makeStyles, Box, Grid, Typography, Card, CardContent, Button, AppBar, Tabs, Tab, Paper } from '@material-ui/core';
+import { makeStyles, Box, Grid, Typography, Card, CardContent, Button, AppBar, Tabs, Tab, Paper, FormControl, InputLabel, Select, MenuItem, useTheme, useMediaQuery } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import GenericTable from '../Table/GenericTable';
 import { fetchItems } from '../../api';
@@ -68,6 +68,9 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
   ];
   const initialTotals = tables.reduce((acc, curr) => ({ ...acc, [curr.itemType]: 0 }), {});
   const [totals, setTotals] = useState<{ [key: string]: number }>(initialTotals);
+  
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Fetching data when the component is mounted
   useEffect(() => {
@@ -103,19 +106,36 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUserId }) => {
         <DashboardIcon /> Dashboard
       </Typography>
       <Box mt={3}>
-        <Paper square>
-          <Tabs
+      <Paper square>
+      {isSmallScreen ? (
+        <FormControl>
+          <InputLabel id="dashboard-tabs-label">Select a Table</InputLabel>
+          <Select
+            labelId="dashboard-tabs-label"
             value={value}
-            indicatorColor="primary"
-            textColor="primary"
-            onChange={handleChange}
-            aria-label="dashboard tabs"
+            onChange={(event) => handleChange(event, Number(event.target.value))}
           >
             {tables.map((table, index) => (
-              <Tab key={index} label={`Total ${table.name} ${totals[table.itemType]}`} />
+              <MenuItem key={index} value={index}>
+                {`Total ${table.name} ${totals[table.itemType]}`}
+              </MenuItem>
             ))}
-          </Tabs>
-        </Paper>
+          </Select>
+        </FormControl>
+      ) : (
+        <Tabs
+          value={value}
+          indicatorColor="primary"
+          textColor="primary"
+          onChange={handleChange}
+          aria-label="dashboard tabs"
+        >
+          {tables.map((table, index) => (
+            <Tab key={index} label={`Total ${table.name} ${totals[table.itemType]}`} />
+          ))}
+        </Tabs>
+      )}
+    </Paper>
         {tables.map((table, index) => (
           <TabPanel value={value} index={index}>
             <Card variant="outlined">

@@ -2,28 +2,28 @@ import axios from 'axios';
 import { User } from './components/User/User';
 
 const api = axios.create({
-  baseURL: 'http://192.168.10.115:8000',
+  baseURL: 'http://192.168.10.115',
 });
 
 export const fetchItems = async (user_id: string, itemType: string) => {
-  const response = await api.get(`/${itemType}?user_id=${user_id}`);
+  const response = await api.get(`/items/${itemType}?user_id=${user_id}`);
   console.log(response)
   return response.data;
 };
 
 export const addItem = async (user_id: string, item: any, itemType: string) => {
   console.log(item)
-  const response = await api.post(`/${itemType}?user_id=${user_id}`, item); 
+  const response = await api.post(`/items/${itemType}?user_id=${user_id}`, item); 
   return response.data;
 };
 
 export const removeItem = async (user_id: string, item: any, itemType: string) => {
-  const response = await api.delete(`/${itemType}?user_id=${user_id}&item_id=${item.item_id}`);
+  const response = await api.delete(`/items/${itemType}?user_id=${user_id}&item_id=${item.item_id}`);
   return response.data;
 };
 
 export const updateItem = async (user_id: string, item: any, itemType: string) => {
-  const response = await api.put(`/${itemType}?user_id=${user_id}`, item);
+  const response = await api.put(`/items/${itemType}?user_id=${user_id}`, item);
   return response.data;
 };
 

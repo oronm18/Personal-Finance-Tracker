@@ -46,7 +46,7 @@ app.add_middleware(
 )
 
 # Initialize the handler
-# handler = JsonBudgetApiHandler('C://temp/budget_data.json')
+# handler = JsonBudgetApiHandler('../../budget_data.json')
 handler = MongoDBBudgetApiHandler()
 ItemUnion = Union[tuple(ITEM_CLASSES.values())]
 
@@ -82,14 +82,14 @@ async def signup(payload: User):
     return {"user_id": user_id}
 
 
-@app.get("/{item_type}", response_model=list[ItemUnion])
+@app.get("/items/{item_type}", response_model=list[ItemUnion])
 async def fetch_items(user_id: str, item_type: str):
     if item_type not in ITEM_CLASSES:
         raise HTTPException(status_code=400, detail="Invalid item type")
     return handler.fetch_items(user_id, ITEM_CLASSES[item_type])
 
 
-@app.post("/{item_type}", response_model=ItemUnion)
+@app.post("/items/{item_type}", response_model=ItemUnion)
 async def add_item(user_id: str, item: ItemUnion, item_type: str):
     if item_type not in ITEM_CLASSES or not isinstance(item, ITEM_CLASSES[item_type]):
         raise HTTPException(status_code=400, detail="Invalid item type")
@@ -98,7 +98,7 @@ async def add_item(user_id: str, item: ItemUnion, item_type: str):
     return item
 
 
-@app.delete("/{item_type}")
+@app.delete("/items/{item_type}")
 async def delete_item(user_id: str, item_id: str, item_type: str):
     if item_type not in ITEM_CLASSES:
         raise HTTPException(status_code=400, detail="Invalid item type")
@@ -106,7 +106,7 @@ async def delete_item(user_id: str, item_id: str, item_type: str):
     return item_id
 
 
-@app.put("/{item_type}")
+@app.put("/items/{item_type}")
 async def update_item(user_id: str, item: ItemUnion, item_type: str):
     if item_type not in ITEM_CLASSES or not isinstance(item, ITEM_CLASSES[item_type]):
         raise HTTPException(status_code=400, detail="Invalid item type")
@@ -117,7 +117,7 @@ async def update_item(user_id: str, item: ItemUnion, item_type: str):
 def run_server(build_directory):
     app.mount("/static", StaticFiles(directory=f"{build_directory}/static"), name="static")
     app.mount("/", FileResponse(f"{build_directory}/index.html", media_type="text/html"), name="index")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=80)
 
 
 if __name__ == "__main__":
